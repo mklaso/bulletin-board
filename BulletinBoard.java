@@ -9,7 +9,7 @@ public class BulletinBoard {
   // global array holding all the notes on the board
   public static ArrayList<Note> notesOnBoard = new ArrayList<Note>();
 
-  BulletinBoard(int width, int height, ArrayList<String> availNoteColours) {
+  public BulletinBoard(int width, int height, ArrayList<String> availNoteColours) {
     this.width = width;
     this.height = height;
     this.availNoteColours = availNoteColours;
