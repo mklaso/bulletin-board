@@ -1,3 +1,4 @@
+import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -15,8 +16,12 @@ public class Server {
       System.exit(1);
     }
 
+    System.out.println("port number is: " + portNumber + "\n");
+
     // listening socket, clients can try to connect
     ServerSocket socket = new ServerSocket(portNumber);
+
+    System.out.println("port number isasgfsdgsdg: " + portNumber + "\n");
 
     while (true) {
       // listen for connection request
@@ -29,6 +34,7 @@ public class Server {
 
       // start the thread
       reqThread.start();
+
     }
 
   }
@@ -37,40 +43,69 @@ public class Server {
     private Socket socket;
     private String methodType;
     private String serverStatusCode; // set the code [e.g 201, 400, etc.] according to the client request
-    private String serverReasonPhrase; // set the information associated with the status code [e.g "Note was created successfully."]
-    private String serverResponseMsg; // combination of the two above [e.g "201 - Created, Note was created successfully."]
+    private String serverReasonPhrase; // set the information associated with the status code [e.g "Note was created
+                                       // successfully."]
+    private String serverResponseMsg; // combination of the two above [e.g "201 - Created, Note was created
+                                      // successfully."]
+    private final Object lock = new Object(); // basically mutex lock setup for synchronization
 
     ClientRequest(Socket socket) {
       this.socket = socket;
     }
 
     public void run() {
+      System.out.println("inside run() funtion...\n");
+      try {
+        Scanner in = new Scanner(socket.getInputStream());
+        // BufferedReader input = new BufferedReader(new
+        // InputStreamReader(socket.getInputStream()));
+        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+        while (in.hasNextLine()) {
+          output.println(in.nextLine().toUpperCase());
+        }
+
+      } catch (Exception e) {
+        System.out.println("Error: " + socket);
+      } finally {
+        try {
+          socket.close();
+        } catch (IOException e) {
+        }
+      }
 
       // main code goes here, setup should probably be something like:
       // parse the stream output from the client socket, determine what the method
       // type from the request is
-      // once method type is known, execute the request ( bunch of if statements, then
-      // call on methods to do the request )
 
-      if (methodType.equals("POST")) {
-        createNote();
-      } else if (methodType.equals("GET")) {
-        getNotes();
-      } else if (methodType.equals("PIN")) {
-        pinNote();
-      } else if (methodType.equals("UNPIN")) {
-        unpinNote();
-      } else if (methodType.equals("SHAKE")) {
-        shakeBoard();
-      } else if (methodType.equals("CLEAR")) {
-        clearBoard();
-      } else if (methodType.equals("DISCONNECT")) {
-        disconnectClient();
-      } else {
-        // this should send an error response back to the client, the print statement
-        // here is just a placeholder for now
-        System.out.println("Invalid request type, either not recognized or unsupported.");
+      synchronized (lock) {
+        // critical section
+        serverStatusCode = "200"; // default "OK" message, only 201 for POST
+        if (methodType.equals("POST")) {
+          createNote();
+          serverStatusCode = "201";
+        } else if (methodType.equals("GET")) {
+          getNotes();
+        } else if (methodType.equals("PIN")) {
+          pinNote();
+        } else if (methodType.equals("UNPIN")) {
+          unpinNote();
+        } else if (methodType.equals("SHAKE")) {
+          shakeBoard();
+        } else if (methodType.equals("CLEAR")) {
+          clearBoard();
+        } else if (methodType.equals("DISCONNECT")) {
+          disconnectClient();
+        } else {
+          // this should send an error response back to the client
+          // this is just a placeholder example for now
+          System.out.println("Invalid request type, either not recognized or unsupported.");
+        }
       }
+
+      // now send the serverResponseMsg back to the client socket
+      serverResponseMsg = serverStatusCode + serverReasonPhrase;
+
+      // output to socket part here
 
     }
 
