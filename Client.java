@@ -16,22 +16,23 @@ public class Client {
     // just an example to test if client and server can connect properly
     try {
       Socket socket = new Socket("192.168.100.183", 55555); // ip-addr, port-num for now
-      System.out.println("Enter lines of text then Ctrl+D or Ctrl+C to quit");
-      Scanner scanner = new Scanner(System.in);
-      Scanner in = new Scanner(socket.getInputStream());
-      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-      while (scanner.hasNextLine()) {
-        out.println(scanner.nextLine());
-        System.out.println(in.nextLine());
-      }
-    } catch (Exception e) {
+      System.out.println("[CLIENT]: Successfully connected to server at port: 55555.\n");
 
+      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+      // read server response and display to client window
+      String response;
+      while ((response = in.readLine()) != null) {
+        System.out.println("[SERVER]: " + response);
+      }
+
+    } catch (Exception e) {
+      System.out.println("Problem connecting to server.\n");
+      System.exit(1);
     } finally {
 
     }
-
-    // for now just to test if the connection to the server works:
-
   }
 
 }

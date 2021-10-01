@@ -5,23 +5,40 @@ import java.util.*;
 public class Server {
   // port number that clients and server will use to connect
   public static int portNumber;
+  public static int boardWidth;
+  public static int boardHeight;
+  public static ArrayList<String> availNoteColours = new ArrayList<String>();
+  public static BulletinBoard bBoard;
 
   public static void main(String argv[]) throws Exception {
 
-    // get port number used to run server on from cmd line
+    // parse cmd arguments and build bulletin board object / note colour list
     try {
       portNumber = Integer.parseInt(argv[0]);
+      boardWidth = Integer.parseInt(argv[1]);
+      boardHeight = Integer.parseInt(argv[2]);
+
+      // 3rd argument should be start of note colour(s)
+      for (int idx = 3; idx < argv.length; idx++) {
+        availNoteColours.add(argv[idx]); // add specified note colours to available note colours for clients to use
+      }
+
     } catch (NumberFormatException nfe) {
-      System.out.println("Error: The first argument must be an integer representing the port number.");
+      System.out.println(
+          "Error: The first three arguments must be integers representing the port number, followed by the width and height of the bulletin board.");
+      System.exit(1);
+    } catch (Exception e) {
+      System.out.println(
+          "Missing argument(s), please try again and provide a port number, width, height, and colour(s) for the notes.");
       System.exit(1);
     }
 
-    System.out.println("port number is: " + portNumber + "\n");
+    // create global bulletin board with the chosen width, height from cmd
+    bBoard = new BulletinBoard(boardWidth, boardHeight, new ArrayList<Note>());
 
     // listening socket, clients can try to connect
     ServerSocket socket = new ServerSocket(portNumber);
-
-    System.out.println("port number isasgfsdgsdg: " + portNumber + "\n");
+    System.out.println("Server is running and accepting connections at port number: " + portNumber + ".\n");
 
     while (true) {
       // listen for connection request
@@ -34,19 +51,21 @@ public class Server {
 
       // start the thread
       reqThread.start();
-
     }
 
   }
 
   private static class ClientRequest implements Runnable {
     private Socket socket;
-    private String methodType;
-    private String serverStatusCode; // set the code [e.g 201, 400, etc.] according to the client request
-    private String serverReasonPhrase; // set the information associated with the status code [e.g "Note was created
-                                       // successfully."]
-    private String serverResponseMsg; // combination of the two above [e.g "201 - Created, Note was created
-                                      // successfully."]
+    private String methodType = "";
+    private String serverStatusCode = ""; // set the code [e.g 201, 400, etc.] according to the client request
+    private String serverReasonPhrase = ""; // set the information associated with the status code [e.g "Note was
+                                            // created
+    // successfully."]
+    private String serverResponseMsg = ""; // combination of the two above [e.g "201 - Created, Note was created
+    // successfully."]
+    private BufferedReader input;
+    private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
 
     ClientRequest(Socket socket) {
@@ -54,23 +73,21 @@ public class Server {
     }
 
     public void run() {
-      System.out.println("inside run() funtion...\n");
-      try {
-        Scanner in = new Scanner(socket.getInputStream());
-        // BufferedReader input = new BufferedReader(new
-        // InputStreamReader(socket.getInputStream()));
-        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-        while (in.hasNextLine()) {
-          output.println(in.nextLine().toUpperCase());
-        }
 
-      } catch (Exception e) {
-        System.out.println("Error: " + socket);
-      } finally {
-        try {
-          socket.close();
-        } catch (IOException e) {
+      // let client know what colour notes are available once connected
+      try {
+        output = new PrintWriter(socket.getOutputStream(), true);
+
+        output.print("The available note colours for use are: ");
+        for (int idx = 0; idx < availNoteColours.size() - 1; idx++) {
+          output.print(availNoteColours.get(idx) + ", "); // add specified note colours to available note colours for
+                                                          // clients to use
         }
+        output.print(
+            availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\n");
+
+      } catch (IOException io) {
+        System.out.println("Error: " + socket);
       }
 
       // main code goes here, setup should probably be something like:
@@ -79,7 +96,17 @@ public class Server {
 
       synchronized (lock) {
         // critical section
+
+        // read input (request message) from client and try to parse it, then service it
+
+        // try {
+        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        // } catch (IOException io) {
+
+        // }
+
         serverStatusCode = "200"; // default "OK" message, only 201 for POST
+        serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
         if (methodType.equals("POST")) {
           createNote();
           serverStatusCode = "201";
@@ -104,9 +131,7 @@ public class Server {
 
       // now send the serverResponseMsg back to the client socket
       serverResponseMsg = serverStatusCode + serverReasonPhrase;
-
-      // output to socket part here
-
+      output.println(serverResponseMsg);
     }
 
     public void createNote() {
