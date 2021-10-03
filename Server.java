@@ -67,6 +67,7 @@ public class Server {
     private BufferedReader input;
     private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
+    private Boolean connected = true; // client is connected at start
 
     ClientRequest(Socket socket) {
       this.socket = socket;
@@ -90,48 +91,48 @@ public class Server {
         System.out.println("Error: " + socket);
       }
 
-      // main code goes here, setup should probably be something like:
-      // parse the stream output from the client socket, determine what the method
-      // type from the request is
+      // keep checking for client requests while client is connected to server
+      while (connected) {
+        synchronized (lock) {
+          // critical section
 
-      synchronized (lock) {
-        // critical section
+          // read input (request message) from client, parse it, then service it
 
-        // read input (request message) from client and try to parse it, then service it
+          // try {
+          // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          // } catch (IOException io) {
 
-        // try {
-        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        // } catch (IOException io) {
+          // }
 
-        // }
-
-        serverStatusCode = "200"; // default "OK" message, only 201 for POST
-        serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
-        if (methodType.equals("POST")) {
-          createNote();
-          serverStatusCode = "201";
-        } else if (methodType.equals("GET")) {
-          getNotes();
-        } else if (methodType.equals("PIN")) {
-          pinNote();
-        } else if (methodType.equals("UNPIN")) {
-          unpinNote();
-        } else if (methodType.equals("SHAKE")) {
-          shakeBoard();
-        } else if (methodType.equals("CLEAR")) {
-          clearBoard();
-        } else if (methodType.equals("DISCONNECT")) {
-          disconnectClient();
-        } else {
-          // this should send an error response back to the client
-          // this is just a placeholder example for now
-          System.out.println("Invalid request type, either not recognized or unsupported.");
+          serverStatusCode = "200"; // default "OK" message, only 201 for POST
+          serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
+          if (methodType.equals("POST")) {
+            createNote();
+            serverStatusCode = "201";
+          } else if (methodType.equals("GET")) {
+            getNotes();
+          } else if (methodType.equals("PIN")) {
+            pinNote();
+          } else if (methodType.equals("UNPIN")) {
+            unpinNote();
+          } else if (methodType.equals("SHAKE")) {
+            shakeBoard();
+          } else if (methodType.equals("CLEAR")) {
+            clearBoard();
+          } else if (methodType.equals("DISCONNECT")) {
+            disconnectClient();
+            connected = false;
+          } else {
+            // this should send an error response back to the client
+            // this is just a placeholder example for now
+            System.out.println("Invalid request type, either not recognized or unsupported.");
+          }
         }
-      }
 
-      // now send the serverResponseMsg back to the client socket
-      serverResponseMsg = serverStatusCode + serverReasonPhrase;
-      output.println(serverResponseMsg);
+        // now send the serverResponseMsg back to the client socket
+        serverResponseMsg = serverStatusCode + serverReasonPhrase;
+        output.println(serverResponseMsg);
+      }
     }
 
     public void createNote() {
