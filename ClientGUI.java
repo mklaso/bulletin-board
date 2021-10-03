@@ -8,6 +8,7 @@ import java.util.*;
 public class ClientGUI {
   private Socket socket;
   private JFrame window;
+  JTextArea clientOutputBox = new JTextArea(6, 1); // 6 rows, 1 column to display text
 
   public ClientGUI() {
     this.window = new JFrame();
@@ -30,13 +31,8 @@ public class ClientGUI {
     JLabel portLabel = new JLabel("Enter port number:", JLabel.CENTER);
     JTextField ipField = new JTextField();
     JTextField portField = new JTextField();
-    JTextArea clientOutputBox = new JTextArea(6, 1); // 6 rows, 1 column to display text
     JButton connect = new JButton("Connect");
     connect.setFont(new Font("Serif", Font.BOLD, 50));
-    // connect.setBackground(Color.blue);
-    // connect.setPreferredSize(new Dimension(100, 50));
-    // ipField.setPreferredSize(new Dimension(100, 30));
-    // portField.setPreferredSize(new Dimension(100, 30));
     connect.setFocusPainted(false);
 
     // # rows, # cols, hgap, vgap
@@ -51,8 +47,38 @@ public class ClientGUI {
     connectPanel.add(clientOutputBox);
     window.add(connectPanel);
 
-    System.out.println("testing...");
+    // button event handlers
+    connect.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        connect(ipField.getText(), Integer.parseInt(portField.getText())); // add error checking to this later
+        connect.setEnabled(false);
+        connect.setText("Connected");
+      }
+    });
 
   }
 
+  public void connect(String IPAddress, int portNumber) {
+
+    try {
+      // connect to server
+      socket = new Socket(IPAddress, portNumber); // ip-addr, port-num for now
+      System.out.println("[CLIENT]: Successfully connected to server at port: " + portNumber + ".\n"); // remove later
+      clientOutputBox.append("[CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
+
+      BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+      // read initial server response and display to client window
+      String response;
+      while ((response = input.readLine()) != null) {
+        System.out.println("[SERVER]: " + response); // remove later
+        clientOutputBox.append("[SERVER]: " + response + "\n");
+      }
+
+    } catch (Exception e) {
+      System.out.println("Problem connecting to server.\n");
+      System.exit(1);
+    }
+  }
 }

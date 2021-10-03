@@ -9,6 +9,7 @@ public class Server {
   public static int boardHeight;
   public static ArrayList<String> availNoteColours = new ArrayList<String>();
   public static BulletinBoard bBoard;
+  public static int clientNumber = 0; // default starts at no clients
 
   public static void main(String argv[]) throws Exception {
 
@@ -48,6 +49,8 @@ public class Server {
 
       // creates a new thread to service each client request
       Thread reqThread = new Thread(request);
+      clientNumber++; // increase total clients connected
+      System.out.println("Client " + clientNumber + " connected to the server.");
 
       // start the thread
       reqThread.start();
@@ -67,7 +70,6 @@ public class Server {
     private BufferedReader input;
     private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
-    private Boolean connected = true; // client is connected at start
 
     ClientRequest(Socket socket) {
       this.socket = socket;
@@ -80,58 +82,60 @@ public class Server {
         output = new PrintWriter(socket.getOutputStream(), true);
 
         output.print("The available note colours for use are: ");
+
         for (int idx = 0; idx < availNoteColours.size() - 1; idx++) {
           output.print(availNoteColours.get(idx) + ", "); // add specified note colours to available note colours for
                                                           // clients to use
         }
         output.print(
             availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\n");
+        output.flush();
+        output.close(); // indicate nothing left to read
 
+        // keep checking for client requests while client is connected to server
+        String response;
+        // (response = input.readLine()) != null
+        while (input.ready()) { // not the right condition, should be something else
+          synchronized (lock) {
+            // critical section
+
+            // read input (request message) from client, parse it, then service it
+
+            serverStatusCode = "200"; // default "OK" message, only 201 for POST
+            serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
+            if (methodType.equals("POST")) {
+              createNote();
+              serverStatusCode = "201";
+            } else if (methodType.equals("GET")) {
+              getNotes();
+            } else if (methodType.equals("PIN")) {
+              pinNote();
+            } else if (methodType.equals("UNPIN")) {
+              unpinNote();
+            } else if (methodType.equals("SHAKE")) {
+              shakeBoard();
+            } else if (methodType.equals("CLEAR")) {
+              clearBoard();
+            } else if (methodType.equals("DISCONNECT")) {
+              disconnectClient();
+              System.out.println("Client " + clientNumber + " disconnected from the server.");
+            } else {
+              // this should send an error response back to the client
+              // this is just a placeholder example for now
+              System.out.println("Invalid request type, either not recognized or unsupported.");
+            }
+          }
+
+          // now send the serverResponseMsg back to the client socket
+          serverResponseMsg = serverStatusCode + serverReasonPhrase;
+          output.println(serverResponseMsg);
+
+          output = new PrintWriter(socket.getOutputStream(), true);
+          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          // response = input.readLine();
+        }
       } catch (IOException io) {
         System.out.println("Error: " + socket);
-      }
-
-      // keep checking for client requests while client is connected to server
-      while (connected) {
-        synchronized (lock) {
-          // critical section
-
-          // read input (request message) from client, parse it, then service it
-
-          // try {
-          // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-          // } catch (IOException io) {
-
-          // }
-
-          serverStatusCode = "200"; // default "OK" message, only 201 for POST
-          serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
-          if (methodType.equals("POST")) {
-            createNote();
-            serverStatusCode = "201";
-          } else if (methodType.equals("GET")) {
-            getNotes();
-          } else if (methodType.equals("PIN")) {
-            pinNote();
-          } else if (methodType.equals("UNPIN")) {
-            unpinNote();
-          } else if (methodType.equals("SHAKE")) {
-            shakeBoard();
-          } else if (methodType.equals("CLEAR")) {
-            clearBoard();
-          } else if (methodType.equals("DISCONNECT")) {
-            disconnectClient();
-            connected = false;
-          } else {
-            // this should send an error response back to the client
-            // this is just a placeholder example for now
-            System.out.println("Invalid request type, either not recognized or unsupported.");
-          }
-        }
-
-        // now send the serverResponseMsg back to the client socket
-        serverResponseMsg = serverStatusCode + serverReasonPhrase;
-        output.println(serverResponseMsg);
       }
     }
 
