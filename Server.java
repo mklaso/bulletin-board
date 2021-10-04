@@ -173,9 +173,16 @@ public class Server {
     public void unpinNote() {
 
     }
-
+	  
     public void shakeBoard() {
-      
+      System.out.println("---------------------------------------");
+      System.out.println("Removing all the notes.");
+	for (Note n : bBoard) {
+		bBoard.remove(n);
+            	System.out.println(n.getnoteColour() + "note with xCoordinate: " + n.getxCoord() + "yCoordinate: "
+						+ n.getyCoord() + "width: "+ n.getwidth()+"height: "+ n.getheight()+ " is removed");
+       }
+       System.out.println("---------------------------------------");
     }
 
     public void clearBoard() {
