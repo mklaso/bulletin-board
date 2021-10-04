@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+//connection error handler
+import java.io.IOException;
 
 public class Server {
   // port number that clients and server will use to connect
