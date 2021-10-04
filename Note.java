@@ -28,52 +28,56 @@ public class Note {
   }
 
   // note setters
-  public void setxCoord(int xCoord) {
-    return this.xCoord = xCoord;
+  public void setXCoord(int xCoord) {
+    this.xCoord = xCoord;
   }
 
-  public void setyCoord(int yCoord) {
-    return this.yCoord = yCoord;
+  public void setYCoord(int yCoord) {
+    this.yCoord = yCoord;
   }
 
-  public void setnoteColour(String noteColour) {
-    return this.noteColour = noteColour;
+  public void setNoteColour(String noteColour) {
+    this.noteColour = noteColour;
   }
 
-  public void setmessage(String message) {
-    return this.message = message;
+  public void setMessage(String message) {
+    this.message = message;
   }
 
-  public void setheight(int height) {
-    return this.height = height;
+  public void setHeight(int height) {
+    this.height = height;
   }
 
-  public void setwidth(int width) {
-    return this.width = width;
+  public void setWidth(int width) {
+    this.width = width;
   }
 
   // note getters
-  public void getxCoord() {
-    return xCoord;
+  public int getXCoord() {
+    return this.xCoord;
   }
 
-  public void getyCoord() {
-    return yCoord;
+  public int getYCoord() {
+    return this.yCoord;
   }
 
-  public void getnoteColour() {
-    return noteColour;
+  public String getNoteColour() {
+    return this.noteColour;
   }
 
-  public void getmessage() {
-    return message;
+  public String getMessage() {
+    return this.message;
   }
 
-  public void getheight() {
-    return height;
+  public int getHeight() {
+    return this.height;
   }
 
-  public void getwidth() {
-    return width;
+  public int getWidth() {
+    return this.width;
+  }
+
+  public Boolean getPinStatus() {
+    return this.isPinned;
   }
 }

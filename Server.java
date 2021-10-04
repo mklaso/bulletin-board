@@ -12,7 +12,7 @@ public class Server {
   public static ArrayList<String> availNoteColours = new ArrayList<String>();
   public static BulletinBoard bBoard;
   public static int clientNumber = 0; // default starts at no clients
-  
+
   public static void main(String argv[]) throws Exception {
 
     // parse cmd arguments and build bulletin board object / note colour list
@@ -173,31 +173,32 @@ public class Server {
     public void unpinNote() {
 
     }
-	  
+
     public void shakeBoard() {
       System.out.println("---------------------------------------");
       System.out.println("Removing all the notes.");
-	for (Note n : bBoard) {
-		bBoard.remove(n);
-            	System.out.println(n.getnoteColour() + "note with xCoordinate: " + n.getxCoord() + "yCoordinate: "
-						+ n.getyCoord() + "width: "+ n.getwidth()+"height: "+ n.getheight()+ " is removed");
-       }
-       System.out.println("---------------------------------------");
+      for (Note n : bBoard.notesOnBoard) {
+        bBoard.notesOnBoard.remove(n);
+        System.out.println(n.getNoteColour() + "note with xCoordinate: " + n.getXCoord() + "yCoordinate: "
+            + n.getYCoord() + "width: " + n.getWidth() + "height: " + n.getHeight() + " is removed");
+      }
+      System.out.println("---------------------------------------");
     }
 
     public void clearBoard() {
       System.out.println("---------------------------------------");
       System.out.println("Removing unpinned notes.");
-       for (Note n : bBoard.notesOnBoard) {
-         if (n.isPinned() == false) {
-            bBoard.remove(n);
-            System.out.println(n.getnoteColour() + "note with xCoordinate: " + n.getxCoord() + "yCoordinate: "
-						+ n.getyCoord() + "width: "+ n.getwidth()+"height: "+ n.getheight()+ " is removed");
-       }
-       System.out.println("---------------------------------------");
+      for (Note n : bBoard.notesOnBoard) {
+        if (!n.getPinStatus()) {
+          bBoard.notesOnBoard.remove(n);
+          System.out.println(n.getNoteColour() + "note with xCoordinate: " + n.getXCoord() + "yCoordinate: "
+              + n.getYCoord() + "width: " + n.getWidth() + "height: " + n.getHeight() + " is removed");
+        }
+      }
+      System.out.println("---------------------------------------");
     }
 
-    public void disconnectClient() throws IOException{
+    public void disconnectClient() throws IOException {
       socket.close();
       input.close();
       output.close();
