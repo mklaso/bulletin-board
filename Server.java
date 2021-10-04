@@ -191,7 +191,7 @@ public class Server {
       for (Note n : bBoard.notesOnBoard) {
         if (!n.getPinStatus()) {
           bBoard.notesOnBoard.remove(n);
-          System.out.println(n.getNoteColour() + "note with xCoordinate: " + n.getXCoord() + "yCoordinate: "
+          System.out.println(n.getNoteColour() + "unpinned note with xCoordinate: " + n.getXCoord() + "yCoordinate: "
               + n.getYCoord() + "width: " + n.getWidth() + "height: " + n.getHeight() + " is removed");
         }
       }
