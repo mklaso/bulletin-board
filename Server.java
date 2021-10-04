@@ -171,7 +171,36 @@ public class Server {
     }
 
     public void unpinNote() {
-
+      //parse x&y coordinates into integers
+      int x_coord = Integer.parseInt(xField.getText());
+			int y_coord = Integer.parseInt(yField.getText());
+      try {
+        System.out.println("---------------------------------------");
+        for (Note n : bBoard.notesOnBoard) {
+          if (n.getXCoord() <= x_coord && n.getYCoord() <= y_coord && n.Pinned_Count > 1) {
+            //unpin the note requested by the client
+            n.Pinned_Count -= 1;
+            n.isPinned = false;
+            System.out.println("Note with x-coordinate: " + n.getX_coordinate() + " and y-coordinate: "
+								+ n.getY_coordinate()+ " is unpinned.");
+            System.out.println("The bulletin board still has " + n.Pinned_Count + " pinned notes.");
+            System.out.println("---------------------------------------");
+         } else if (n.getXCoord() <= x_coord && n.getYCoord() <= y_coord && n.Pinned_Count == 1) {
+            //unpin the only pinned note
+            n.Pinned_Count = 0;
+            n.isPinned = false;
+            System.out.println("The only " + n.getNoteColour() + "note with xCoordinate: " + n.getXCoord() + "yCoordinate: "
+            + n.getYCoord() + "width: " + n.getWidth() + "height: " + n.getHeight() + " is unpinned.");
+            System.out.println("---------------------------------------");
+          } else {
+            System.out.println("The note is not pinned, unable to unpin it.");
+            System.out.println("---------------------------------------");
+          }
+          
+          }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
     }
 
     public void shakeBoard() {
