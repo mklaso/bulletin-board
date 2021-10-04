@@ -10,7 +10,7 @@ public class Server {
   public static ArrayList<String> availNoteColours = new ArrayList<String>();
   public static BulletinBoard bBoard;
   public static int clientNumber = 0; // default starts at no clients
-
+  
   public static void main(String argv[]) throws Exception {
 
     // parse cmd arguments and build bulletin board object / note colour list
@@ -131,9 +131,10 @@ public class Server {
           output.println(serverResponseMsg);
 
           output = new PrintWriter(socket.getOutputStream(), true);
-          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          input = new BufferedReader(new InputStreamReader(socket.getInputStream()), true);
           // response = input.readLine();
         }
+        
       } catch (IOException io) {
         System.out.println("Error: " + socket);
       }
@@ -156,15 +157,17 @@ public class Server {
     }
 
     public void shakeBoard() {
-
+      
     }
 
     public void clearBoard() {
-
+       
     }
 
-    public void disconnectClient() {
-
+    public void disconnectClient() throws IOException{
+      socket.close();
+      input.close();
+      output.close();
     }
   }
 }
