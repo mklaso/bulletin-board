@@ -47,11 +47,12 @@ public class Server {
       // listen for connection request
       Socket connection = socket.accept();
 
+      clientNumber++; // increase total clients connected
       ClientRequest request = new ClientRequest(connection);
 
       // creates a new thread to service each client request
       Thread reqThread = new Thread(request);
-      clientNumber++; // increase total clients connected
+
       System.out.println("Client " + clientNumber + " connected to the server.");
 
       // start the thread
@@ -95,7 +96,6 @@ public class Server {
         output.print(
             availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\r\n");
         output.flush();
-        // output.close(); // indicate nothing left to read
 
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -125,9 +125,6 @@ public class Server {
               shakeBoard();
             } else if (methodType.equals("CLEAR")) {
               clearBoard();
-            } else if (methodType.equals("DISCONNECT")) {
-              disconnectClient();
-              System.out.println("Client " + clientNumber + " disconnected from the server.");
             } else {
               // this should send an error response back to the client
               // this is just a placeholder example for now
@@ -141,6 +138,7 @@ public class Server {
 
           // response = input.readLine();
         }
+        disconnectClient();
       } catch (IOException io) {
         System.out.println("Error: " + socket + ". Closing socket and ending connection");
         try {
@@ -219,9 +217,9 @@ public class Server {
     }
 
     public void disconnectClient() throws IOException {
-      socket.close();
       input.close();
       output.close();
+      socket.close();
       System.out.println("Client " + clientID + " disconnected from the server.");
     }
   }

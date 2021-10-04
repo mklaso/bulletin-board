@@ -263,7 +263,8 @@ public class ClientGUI {
     disconnectBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        sendRequest("DISCONNECT");
+        // sendRequest("DISCONNECT");
+        disconnect();
       }
     });
 
@@ -325,6 +326,20 @@ public class ClientGUI {
     }
   }
 
+  public void disconnect() {
+    try {
+      if (input != null && output != null) {
+        input.close();
+        output.close();
+      }
+      socket.close();
+      System.exit(0);
+    } catch (Exception e) {
+      System.out.println("Socket already closed.");
+      System.exit(0);
+    }
+  }
+
   /**
    * Parse the client's request data, and check if data is valid, if it is - make
    * the request to the server. Otherwise indicate the error to the client window,
@@ -352,9 +367,9 @@ public class ClientGUI {
       output.println("SHAKE");
     } else if (requestType.equals("CLEAR")) {
       output.println("CLEAR");
-    } else if (requestType.equals("DISCONNECT")) {
-      output.println("DISCONNECT");
     }
+    output.flush();
+    output.close();
 
     // check what request type is first, see if it matches one of the above ^
 
