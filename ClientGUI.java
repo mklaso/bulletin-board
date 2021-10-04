@@ -9,6 +9,8 @@ public class ClientGUI {
   private Socket socket;
   JTextArea clientOutputBox = new JTextArea(12, 1);
   JFrame window;
+  PrintWriter output;
+  BufferedReader input;
 
   public ClientGUI() {
     this.window = new JFrame();
@@ -255,7 +257,41 @@ public class ClientGUI {
         connectBtn.setEnabled(false);
         disconnectBtn.setEnabled(true);
         connectBtn.setText("Connected");
+      }
+    });
 
+    disconnectBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("DISCONNECT");
+      }
+    });
+
+    postBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("POST");
+      }
+    });
+
+    getBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("GET");
+      }
+    });
+
+    shakeBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("SHAKE");
+      }
+    });
+
+    clearBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("CLEAR");
       }
     });
 
@@ -273,15 +309,13 @@ public class ClientGUI {
     try {
       // connect to server
       socket = new Socket(IPAddress, portNumber); // ip-addr, port-num for now
-      System.out.println("[CLIENT]: Successfully connected to server at port: " + portNumber + ".\n"); // remove later
       clientOutputBox.append("[CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
 
-      BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
       // read initial server response and display to client window
       String response;
-      while ((response = input.readLine()) != null) {
-        System.out.println("[SERVER]: " + response); // remove later
+      while (input.ready() && (response = input.readLine()) != null) {
         clientOutputBox.append("[SERVER]: " + response + "\n");
       }
 
@@ -300,7 +334,27 @@ public class ClientGUI {
    *                    SHAKE, CLEAR}
    */
   public void sendRequest(String requestType) {
+    try {
+      output = new PrintWriter(socket.getOutputStream(), true);
+    } catch (IOException io) {
+
+    }
     // NOTE: for each request button, call this method within their actionListener
+    if (requestType.equals("POST")) {
+      output.println("POST");
+    } else if (requestType.equals("GET")) {
+      output.println("GET");
+    } else if (requestType.equals("PIN")) {
+      output.println("PIN");
+    } else if (requestType.equals("UNPIN")) {
+      output.println("UNPIN");
+    } else if (requestType.equals("SHAKE")) {
+      output.println("SHAKE");
+    } else if (requestType.equals("CLEAR")) {
+      output.println("CLEAR");
+    } else if (requestType.equals("DISCONNECT")) {
+      output.println("DISCONNECT");
+    }
 
     // check what request type is first, see if it matches one of the above ^
 

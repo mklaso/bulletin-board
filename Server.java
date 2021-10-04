@@ -72,9 +72,11 @@ public class Server {
     private BufferedReader input;
     private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
+    private int clientID;
 
     ClientRequest(Socket socket) {
       this.socket = socket;
+      this.clientID = clientNumber;
     }
 
     public void run() {
@@ -82,6 +84,7 @@ public class Server {
       // let client know what colour notes are available once connected
       try {
         output = new PrintWriter(socket.getOutputStream(), true);
+        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         output.print("The available note colours for use are: ");
 
@@ -90,84 +93,77 @@ public class Server {
                                                           // clients to use
         }
         output.print(
-            availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\n");
+            availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\r\n");
         output.flush();
-        output.close(); // indicate nothing left to read
+        // output.close(); // indicate nothing left to read
 
-        // ==============================================================================
-        // NOTE: STUFF BELOW COMMENTED OUT TO GET AROUND AN ERROR FOR NOW, will
-        // uncomment
-        // after i fix the setup
-        // ==============================================================================
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         // keep checking for client requests while client is connected to server
-        // String response;
-        // (response = input.readLine()) != null
-        // while (true) { // not the right condition, should be something else
-        // synchronized (lock) {
+        String response;
+        while ((response = input.readLine()) != null) { // not the right condition, should be something else
+          synchronized (lock) {
+            // critical section
+            methodType = response; // just for now, eventually will need to parse the reponse string, can tokenize
+                                   // on spaces, where first token is always the methodType, and the rest of the
+                                   // tokens are arguments for the methods
 
-        // // critical section
+            // read input (request message) from client, parse it, then service it
 
-        // // read input (request message) from client, parse it, then service it
+            serverStatusCode = "200"; // default "OK" message, only 201 for POST
+            serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
+            if (methodType.equals("POST")) {
+              createNote();
+              serverStatusCode = "201";
+            } else if (methodType.equals("GET")) {
+              getNotes();
+            } else if (methodType.equals("PIN")) {
+              pinNote();
+            } else if (methodType.equals("UNPIN")) {
+              unpinNote(1, 1); // for now just so it compiles
+            } else if (methodType.equals("SHAKE")) {
+              shakeBoard();
+            } else if (methodType.equals("CLEAR")) {
+              clearBoard();
+            } else if (methodType.equals("DISCONNECT")) {
+              disconnectClient();
+              System.out.println("Client " + clientNumber + " disconnected from the server.");
+            } else {
+              // this should send an error response back to the client
+              // this is just a placeholder example for now
+              System.out.println("Invalid request type, either not recognized orunsupported.");
+            }
+          }
 
-        // serverStatusCode = "200"; // default "OK" message, only 201 for POST
-        // serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
-        // if (methodType.equals("POST")) {
-        // createNote();
-        // serverStatusCode = "201";
-        // } else if (methodType.equals("GET")) {
-        // getNotes();
-        // } else if (methodType.equals("PIN")) {
-        // pinNote();
-        // } else if (methodType.equals("UNPIN")) {
-        // unpinNote();
-        // } else if (methodType.equals("SHAKE")) {
-        // shakeBoard();
-        // } else if (methodType.equals("CLEAR")) {
-        // clearBoard();
-        // } else if (methodType.equals("DISCONNECT")) {
-        // disconnectClient();
-        // System.out.println("Client " + clientNumber + " disconnected from the
-        // server.");
-        // } else {
-        // // this should send an error response back to the client
-        // // this is just a placeholder example for now
-        // System.out.println("Invalid request type, either not recognized or
-        // unsupported.");
-        // }
-        // }
+          // now send the serverResponseMsg back to the client socket
+          serverResponseMsg = serverStatusCode + serverReasonPhrase;
+          output.println(serverResponseMsg + "\r\n");
 
-        // // now send the serverResponseMsg back to the client socket
-        // serverResponseMsg = serverStatusCode + serverReasonPhrase;
-        // output.println(serverResponseMsg);
-
-        // output = new PrintWriter(socket.getOutputStream(), true);
-        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        // // response = input.readLine();
-        // }
-        // } catch (IOException io) {
-        // System.out.println("Error: " + socket + ". Closing socket and ending
-        // connection");
-        // try {
-        // socket.close();
-        // } catch (Exception e) {
-        // System.out.println("Socket already closed.");
-        // }
+          // response = input.readLine();
+        }
+      } catch (IOException io) {
+        System.out.println("Error: " + socket + ". Closing socket and ending connection");
+        try {
+          socket.close();
+        } catch (Exception e) {
+          System.out.println("Socket already closed.");
+        }
       } catch (Exception e) {
         // fill in later
       }
     }
 
     public void createNote() {
+      System.out.println("created note.");
 
     }
 
     public void getNotes() {
-
+      System.out.println("got notes.");
     }
 
     public void pinNote() {
-
+      System.out.println("pinned note.");
     }
 
     public void unpinNote(int xCoord, int yCoord) {
@@ -226,7 +222,7 @@ public class Server {
       socket.close();
       input.close();
       output.close();
-      System.exit(0);
+      System.out.println("Client " + clientID + " disconnected from the server.");
     }
   }
 }
