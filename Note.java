@@ -27,6 +27,7 @@ public class Note {
     }
   }
   
+  //note setters
   public void setxCoord(int xCoord) {
     return this.xCoord = xCoord;
   }
@@ -51,4 +52,28 @@ public class Note {
     return this.width = width;
   }
   
+  //note getters 
+  public void getxCoord(int xCoord) {
+    return xCoord;
+  }
+  
+  public void getyCoord(int yCoord) {
+    return yCoord;
+  }
+  
+  public void getnoteColour(String noteColour) {
+    return noteColour;
+  }
+  
+  public void getmessage(String message) {
+    return message;
+  }
+  
+  public void getheight(int height) {
+    return height;
+  }
+  
+  public void getwidth(int width) {
+    return width;
+  }
 }
