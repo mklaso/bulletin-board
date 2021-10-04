@@ -150,8 +150,24 @@ public class Server {
       System.out.println("got notes.");
     }
 
-    public void pinNote() {
+    public void pinNote(int xCoord, int yCoord) {
+      // xCoord and yCoord come from parsed client request msg
       System.out.println("pinned note.");
+      System.out.println("---------------------------------------");
+        for (Note n : bBoard.notesOnBoard) {
+          if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
+            // pin the note requested by the client, increase the number of pins by 1
+            // current note
+            n.increasePinCount();
+            n.setPinStatus("PIN");
+            System.out.println(
+                "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is pinned.");
+            System.out.println("The bulletin board now has " + n.getPinnedCount() + " pinned notes.");
+            System.out.println("---------------------------------------");
+          } else {
+            System.out.println("The note's coordinate is out of range, cannot be pinned.");
+            System.out.println("---------------------------------------");
+          }
     }
 
     public void unpinNote(int xCoord, int yCoord) {
