@@ -85,19 +85,12 @@ public class Server {
       // let client know what colour notes are available once connected
       try {
         output = new PrintWriter(socket.getOutputStream(), true);
-        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-        output.print("The available note colours for use are: ");
-
-        for (int idx = 0; idx < availNoteColours.size() - 1; idx++) {
-          output.print(availNoteColours.get(idx) + ", "); // add specified note colours to available note colours for
-                                                          // clients to use
-        }
-        output.print(
-            availNoteColours.get(availNoteColours.size() - 1) + ".\nIMPORTANT - Note colours are case sensitive.\r\n");
-        output.flush();
-
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        for (int idx = 0; idx < availNoteColours.size(); idx++) {
+          output.println(availNoteColours.get(idx)); // send client what note colours are available
+        }
+        output.flush();
 
         // keep checking for client requests while client is connected to server
         String response;
@@ -135,14 +128,11 @@ public class Server {
           // now send the serverResponseMsg back to the client socket
           serverResponseMsg = serverStatusCode + serverReasonPhrase;
           output.println(serverResponseMsg + "\r\n");
-
-          // response = input.readLine();
         }
         disconnectClient();
       } catch (IOException io) {
-        System.out.println("Error: " + socket + ". Closing socket and ending connection");
         try {
-          socket.close();
+          disconnectClient();
         } catch (Exception e) {
           System.out.println("Socket already closed.");
         }

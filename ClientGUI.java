@@ -8,6 +8,7 @@ import java.util.*;
 public class ClientGUI {
   private Socket socket;
   JTextArea clientOutputBox = new JTextArea(12, 1);
+  JComboBox<String> colourCombo = new JComboBox<>(); // holds avail. note colours
   JFrame window;
   PrintWriter output;
   BufferedReader input;
@@ -48,7 +49,6 @@ public class ClientGUI {
     JLabel colourLabel = new JLabel("Colour");
     JLabel statusLabel = new JLabel("Status");
     JComboBox<String> statusCombo = new JComboBox<>();
-    JComboBox<String> colourCombo = new JComboBox<>();
     JLabel refersLabel = new JLabel("RefersTo=");
     JLabel containsLabel = new JLabel("Contains=");
     JLabel colourLabel2 = new JLabel("Colour=");
@@ -70,13 +70,9 @@ public class ClientGUI {
 
     // allow these options for status, colour in GET section
     String[] statusChoices = { "Unpinned", "Pinned" };
-    String[] colourChoices = { "Red", "White", "Blue" }; // make this accessible to connect, and add notes directly
-                                                         // through that
 
     statusCombo.setModel(new DefaultComboBoxModel<>(statusChoices));
     statusCombo.setBorder(null);
-
-    colourCombo.setModel(new DefaultComboBoxModel<>(colourChoices));
     colourCombo.setBorder(null);
 
     allPinsCheck.setFont(new Font("Tahoma", 1, 12));
@@ -314,11 +310,14 @@ public class ClientGUI {
 
       input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+      clientOutputBox.append("[SERVER]: The available note colours for use are: ");
       // read initial server response and display to client window
       String response;
       while (input.ready() && (response = input.readLine()) != null) {
-        clientOutputBox.append("[SERVER]: " + response + "\n");
+        clientOutputBox.append(response + " ");
+        colourCombo.addItem(response);
       }
+      clientOutputBox.append("\n[SERVER]: IMPORTANT - Note colours are case sensitive.");
 
     } catch (Exception e) {
       System.out.println("Problem connecting to server.\n");
