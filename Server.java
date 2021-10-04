@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+//connection error handler
+import java.io.IOException;
 
 public class Server {
   // port number that clients and server will use to connect
@@ -10,7 +12,7 @@ public class Server {
   public static ArrayList<String> availNoteColours = new ArrayList<String>();
   public static BulletinBoard bBoard;
   public static int clientNumber = 0; // default starts at no clients
-
+  
   public static void main(String argv[]) throws Exception {
 
     // parse cmd arguments and build bulletin board object / note colour list
@@ -173,15 +175,26 @@ public class Server {
     }
 
     public void shakeBoard() {
-
+      
     }
 
     public void clearBoard() {
-
+      System.out.println("---------------------------------------");
+      System.out.println("Removing unpinned notes.");
+       for (Note n : bBoard.notesOnBoard) {
+         if (n.isPinned() == false) {
+            bBoard.remove(n);
+            System.out.println(n.getnoteColour() + "note with xCoordinate: " + n.getxCoord() + "yCoordinate: "
+						+ n.getyCoord() + "width: "+ n.getwidth()+"height: "+ n.getheight()+ " is removed");
+       }
+       System.out.println("---------------------------------------");
     }
 
-    public void disconnectClient() {
-
+    public void disconnectClient() throws IOException{
+      socket.close();
+      input.close();
+      output.close();
+      System.exit(0);
     }
   }
 }
