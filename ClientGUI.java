@@ -368,7 +368,6 @@ public class ClientGUI {
       output.println("CLEAR");
     }
     output.flush();
-    output.close();
 
     // check what request type is first, see if it matches one of the above ^
 
