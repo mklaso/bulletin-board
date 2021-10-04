@@ -161,13 +161,22 @@ public class Server {
     }
 
     public void clearBoard() {
-       
+      System.out.println("---------------------------------------");
+      System.out.println("Removing unpinned notes.");
+       for (Note n : bBoard) {
+         if (n.isPinned() == false) {
+            bBoard.remove(n);
+            System.out.println(n.getnoteColour() + "note with xCoordinate: " + n.getxCoord() + "yCoordinate: "
+						+ n.getyCoord() + "width: "+ n.getwidth()+"height: "+ n.getheight()+ " is removed");
+       }
+       System.out.println("---------------------------------------");
     }
 
     public void disconnectClient() throws IOException{
       socket.close();
       input.close();
       output.close();
+      System.exit(0);
     }
   }
 }
