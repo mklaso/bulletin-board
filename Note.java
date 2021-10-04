@@ -26,4 +26,29 @@ public class Note {
       this.isPinned = false;
     }
   }
+  
+  public void setxCoord(int xCoord) {
+    return this.xCoord = xCoord;
+  }
+  
+  public void setyCoord(int yCoord) {
+    return this.yCoord = yCoord;
+  }
+  
+  public void setnoteColour(String noteColour) {
+    return this.noteColour = noteColour;
+  }
+  
+  public void setmessage(String message) {
+    return this.message = message;
+  }
+  
+  public void setheight(int height) {
+    return this.height = height;
+  }
+  
+  public void setwidth(int width) {
+    return this.width = width;
+  }
+  
 }
