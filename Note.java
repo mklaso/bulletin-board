@@ -53,27 +53,27 @@ public class Note {
   }
   
   //note getters 
-  public void getxCoord(int xCoord) {
+  public void getxCoord() {
     return xCoord;
   }
   
-  public void getyCoord(int yCoord) {
+  public void getyCoord() {
     return yCoord;
   }
   
-  public void getnoteColour(String noteColour) {
+  public void getnoteColour() {
     return noteColour;
   }
   
-  public void getmessage(String message) {
+  public void getmessage() {
     return message;
   }
   
-  public void getheight(int height) {
+  public void getheight() {
     return height;
   }
   
-  public void getwidth(int width) {
+  public void getwidth() {
     return width;
   }
 }
