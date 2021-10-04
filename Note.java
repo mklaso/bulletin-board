@@ -1,7 +1,7 @@
 public class Note {
 
   private String message, noteColour;
-  private int xCoord, yCoord, width, height;
+  private int xCoord, yCoord, width, height, Pinned_Count;
   private Boolean isPinned;
 
   public Note(String message, String noteColour, int xCoord, int yCoord, int width, int height) {
@@ -12,6 +12,7 @@ public class Note {
     this.width = width;
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
+    this.Pinned_Count = 0;
   }
 
   /**
@@ -80,4 +81,9 @@ public class Note {
   public Boolean getPinStatus() {
     return this.isPinned;
   }
+  
+  public int getPinned_Count() {
+    return this.Pinned_Count;
+  }
+
 }
