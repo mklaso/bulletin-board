@@ -35,6 +35,15 @@ public class Note {
       this.pinnedCount--;
     }
   }
+  
+  public void increasePinCount() {
+    if (this.pinnedCount == 0) {
+      this.pinnedCount = 1;
+    } else {
+      this.pinnedCount++;
+    }
+  }
+
 
   // note setters
   public void setXCoord(int xCoord) {
