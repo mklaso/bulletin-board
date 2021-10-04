@@ -92,50 +92,67 @@ public class Server {
         output.flush();
         output.close(); // indicate nothing left to read
 
+        // ==============================================================================
+        // NOTE: STUFF BELOW COMMENTED OUT TO GET AROUND AN ERROR FOR NOW, will
+        // uncomment
+        // after i fix the setup
+        // ==============================================================================
+
         // keep checking for client requests while client is connected to server
-        String response;
+        // String response;
         // (response = input.readLine()) != null
-        while (input.ready()) { // not the right condition, should be something else
-          synchronized (lock) {
-            // critical section
+        // while (true) { // not the right condition, should be something else
+        // synchronized (lock) {
 
-            // read input (request message) from client, parse it, then service it
+        // // critical section
 
-            serverStatusCode = "200"; // default "OK" message, only 201 for POST
-            serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
-            if (methodType.equals("POST")) {
-              createNote();
-              serverStatusCode = "201";
-            } else if (methodType.equals("GET")) {
-              getNotes();
-            } else if (methodType.equals("PIN")) {
-              pinNote();
-            } else if (methodType.equals("UNPIN")) {
-              unpinNote();
-            } else if (methodType.equals("SHAKE")) {
-              shakeBoard();
-            } else if (methodType.equals("CLEAR")) {
-              clearBoard();
-            } else if (methodType.equals("DISCONNECT")) {
-              disconnectClient();
-              System.out.println("Client " + clientNumber + " disconnected from the server.");
-            } else {
-              // this should send an error response back to the client
-              // this is just a placeholder example for now
-              System.out.println("Invalid request type, either not recognized or unsupported.");
-            }
-          }
+        // // read input (request message) from client, parse it, then service it
 
-          // now send the serverResponseMsg back to the client socket
-          serverResponseMsg = serverStatusCode + serverReasonPhrase;
-          output.println(serverResponseMsg);
+        // serverStatusCode = "200"; // default "OK" message, only 201 for POST
+        // serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
+        // if (methodType.equals("POST")) {
+        // createNote();
+        // serverStatusCode = "201";
+        // } else if (methodType.equals("GET")) {
+        // getNotes();
+        // } else if (methodType.equals("PIN")) {
+        // pinNote();
+        // } else if (methodType.equals("UNPIN")) {
+        // unpinNote();
+        // } else if (methodType.equals("SHAKE")) {
+        // shakeBoard();
+        // } else if (methodType.equals("CLEAR")) {
+        // clearBoard();
+        // } else if (methodType.equals("DISCONNECT")) {
+        // disconnectClient();
+        // System.out.println("Client " + clientNumber + " disconnected from the
+        // server.");
+        // } else {
+        // // this should send an error response back to the client
+        // // this is just a placeholder example for now
+        // System.out.println("Invalid request type, either not recognized or
+        // unsupported.");
+        // }
+        // }
 
-          output = new PrintWriter(socket.getOutputStream(), true);
-          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-          // response = input.readLine();
-        }
-      } catch (IOException io) {
-        System.out.println("Error: " + socket);
+        // // now send the serverResponseMsg back to the client socket
+        // serverResponseMsg = serverStatusCode + serverReasonPhrase;
+        // output.println(serverResponseMsg);
+
+        // output = new PrintWriter(socket.getOutputStream(), true);
+        // input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        // // response = input.readLine();
+        // }
+        // } catch (IOException io) {
+        // System.out.println("Error: " + socket + ". Closing socket and ending
+        // connection");
+        // try {
+        // socket.close();
+        // } catch (Exception e) {
+        // System.out.println("Socket already closed.");
+        // }
+      } catch (Exception e) {
+        // fill in later
       }
     }
 

@@ -7,60 +7,269 @@ import java.util.*;
 
 public class ClientGUI {
   private Socket socket;
-  private JFrame window;
-  JTextArea clientOutputBox = new JTextArea(6, 1); // 6 rows, 1 column to display text
+  JTextArea clientOutputBox = new JTextArea(12, 1);
+  JFrame window;
 
   public ClientGUI() {
     this.window = new JFrame();
+    this.startGUI();
   }
 
   public void startGUI() {
-    window.setSize(900, 600);
-    window.setTitle("Bulletin Board Application");
+    window.setSize(880, 700);
+    window.setTitle("Bulletin Board Client Application");
     window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    window.setResizable(false);
     setupGUI();
     window.setVisible(true);
   }
 
   // adding all the components to GUI, setup controller logic
   public void setupGUI() {
-    // note: this isn't how the GUI is actually going to look, this is just to test
-    // client-server connection with the added GUI component
-    JPanel connectPanel = new JPanel();
-    JLabel ipLabel = new JLabel("Enter IP address:", JLabel.CENTER);
-    JLabel portLabel = new JLabel("Enter port number:", JLabel.CENTER);
-    JTextField ipField = new JTextField();
-    JTextField portField = new JTextField();
-    JButton connect = new JButton("Connect");
-    connect.setFont(new Font("Serif", Font.BOLD, 50));
-    connect.setFocusPainted(false);
 
-    // # rows, # cols, hgap, vgap
-    GridLayout layout = new GridLayout(3, 2, 5, 2);
-    connectPanel.setLayout(layout);
+    JLabel portNumLabel = new JLabel("Port Number");
+    JLabel IPAddrLabel = new JLabel("IP Address");
+    JTextField portNumField = new JTextField();
+    JTextField IPAddrField = new JTextField();
+    JButton disconnectBtn = new JButton("Disconnect");
+    JButton connectBtn = new JButton("Connect");
+    JLabel xLabel = new JLabel("X Coordinate");
+    JLabel yLabel = new JLabel("Y Coordinate");
+    JLabel widthLabel = new JLabel("Width");
+    JLabel heightLabel = new JLabel("Height");
+    JTextField xField = new JTextField();
+    JTextField yField = new JTextField();
+    JTextField widthField = new JTextField();
+    JTextField heightField = new JTextField();
+    JLabel msgLabel = new JLabel("Message");
+    JTextField msgField = new JTextField();
+    JLabel colourLabel = new JLabel("Colour");
+    JLabel statusLabel = new JLabel("Status");
+    JComboBox<String> statusCombo = new JComboBox<>();
+    JComboBox<String> colourCombo = new JComboBox<>();
+    JLabel refersLabel = new JLabel("RefersTo=");
+    JLabel containsLabel = new JLabel("Contains=");
+    JLabel colourLabel2 = new JLabel("Colour=");
+    JTextField refersField = new JTextField();
+    JTextField containsField = new JTextField();
+    JTextField colourField = new JTextField();
+    JButton getBtn = new JButton("GET");
+    JCheckBox allPinsCheck = new JCheckBox("ALL PINS");
+    JButton shakeBtn = new JButton("SHAKE");
+    JButton clearBtn = new JButton("CLEAR");
+    JScrollPane jScrollPane1 = new JScrollPane();
+    JButton postBtn = new JButton("POST");
+    JSeparator jSeparator1 = new JSeparator();
+    JSeparator jSeparator2 = new JSeparator();
+    JSeparator jSeparator3 = new JSeparator();
 
-    connectPanel.add(ipLabel);
-    connectPanel.add(ipField);
-    connectPanel.add(portLabel);
-    connectPanel.add(portField);
-    connectPanel.add(connect);
-    connectPanel.add(clientOutputBox);
-    window.add(connectPanel);
+    disconnectBtn.setEnabled(false);
+    connectBtn.setPreferredSize(new Dimension(135, 35));
 
-    // button event handlers
-    connect.addActionListener(new ActionListener() {
+    // allow these options for status, colour in GET section
+    String[] statusChoices = { "Unpinned", "Pinned" };
+    String[] colourChoices = { "Red", "White", "Blue" }; // make this accessible to connect, and add notes directly
+                                                         // through that
+
+    statusCombo.setModel(new DefaultComboBoxModel<>(statusChoices));
+    statusCombo.setBorder(null);
+
+    colourCombo.setModel(new DefaultComboBoxModel<>(colourChoices));
+    colourCombo.setBorder(null);
+
+    allPinsCheck.setFont(new Font("Tahoma", 1, 12));
+    jScrollPane1.setViewportView(clientOutputBox);
+
+    // making it look nice and organized
+    GroupLayout layout = new GroupLayout(window.getContentPane());
+    window.getContentPane().setLayout(layout);
+    layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+        .createSequentialGroup()
+        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup()
+            .addGap(150, 150, 150)
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 531, GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(portNumLabel, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(portNumField, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(IPAddrLabel, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(IPAddrField, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)))
+                    .addGap(29, 29, 29)
+                    .addComponent(connectBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18).addComponent(disconnectBtn))
+                .addGroup(layout.createSequentialGroup().addComponent(xLabel).addGap(17, 17, 17)
+                    .addComponent(xField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE).addGap(42, 42, 42)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup().addGap(51, 51, 51).addComponent(widthField,
+                            GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(widthLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+                    .addGap(42, 42, 42)
+                    .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
+                    .addComponent(colourCombo, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(refersLabel)
+                            .addComponent(containsLabel))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(refersField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                .addGap(37, 37, 37).addComponent(colourLabel2).addGap(18, 18, 18)
+                                .addComponent(colourField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(containsField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                                    Short.MAX_VALUE)
+                                .addComponent(allPinsCheck)))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                            Short.MAX_VALUE)
+                        .addComponent(getBtn, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(GroupLayout.Alignment.LEADING,
+                        layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(msgLabel)
+                                .addComponent(msgField, GroupLayout.PREFERRED_SIZE, 356, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                            .addComponent(postBtn, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(yLabel)
+                            .addGroup(layout.createSequentialGroup().addGap(95, 95, 95)
+                                .addComponent(yField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42)
+                                .addComponent(heightLabel, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(heightField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42)
+                                .addComponent(statusLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(statusCombo, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))))
+            .addGap(0, 153, Short.MAX_VALUE)).addComponent(jSeparator1, GroupLayout.Alignment.TRAILING)
+            .addComponent(jSeparator2, GroupLayout.Alignment.TRAILING)
+            .addComponent(jSeparator3, GroupLayout.Alignment.TRAILING))
+        .addContainerGap())
+        .addGroup(layout.createSequentialGroup().addGap(259, 259, 259)
+            .addComponent(shakeBtn, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE).addGap(71, 71, 71)
+            .addComponent(clearBtn, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+    layout.setVerticalGroup(
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(GroupLayout.Alignment.TRAILING,
+            layout.createSequentialGroup().addContainerGap(40, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(portNumLabel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(portNumField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(IPAddrLabel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(IPAddrField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(connectBtn, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(disconnectBtn, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 56,
+                        GroupLayout.PREFERRED_SIZE))
+                .addGap(16, 16, 16)
+                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(xLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(widthLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(xField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addComponent(widthField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE).addComponent(
+                        colourCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(yLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(heightLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(yField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addComponent(heightField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addComponent(statusLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE).addComponent(
+                        statusCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(msgLabel, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addComponent(postBtn, GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE).addComponent(msgField))
+                .addGap(20, 20, 20)
+                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup().addGap(11, 11, 11)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(refersLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(colourLabel2, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(refersField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(colourField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(containsLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(containsField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(allPinsCheck)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                            Short.MAX_VALUE)
+                        .addComponent(getBtn, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator3, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(shakeBtn)
+                    .addComponent(clearBtn))
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 249, GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)));
+
+    // style components used in GUI - mainly buttons/text
+    Container parent = window.getContentPane();
+    for (Component comp : parent.getComponents()) {
+      if (comp instanceof JLabel) {
+        comp.setFont(new Font("Tahoma", 1, 12));
+      } else if (comp instanceof JTextField) {
+        comp.setFont(new Font("Tahoma", 0, 12));
+      } else if (comp instanceof JButton) {
+        comp.setBackground(new Color(255, 255, 255));
+        comp.setFont(new Font("Segoe UI", 1, 20));
+        JButton temp = (JButton) comp;
+        temp.setBorderPainted(false);
+      }
+    }
+
+    // action listeners/event handlers (follow same format for pretty much every
+    // request button, but call sendRequest() instead)
+    connectBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        connect(ipField.getText(), Integer.parseInt(portField.getText())); // add error checking to this later
-        connect.setEnabled(false);
-        connect.setText("Connected");
+        connect(IPAddrField.getText(), Integer.parseInt(portNumField.getText())); // add error checking to this later
+        connectBtn.setEnabled(false);
+        disconnectBtn.setEnabled(true);
+        connectBtn.setText("Connected");
+
       }
     });
 
+    window.pack();
   }
 
+  /**
+   * Attempt to connect to the server that is listening for
+   * connections @portNumber and @IPAddress
+   * 
+   * @param IPAddress  - ip address to connect to server
+   * @param portNumber - port number to connect to server
+   */
   public void connect(String IPAddress, int portNumber) {
-
     try {
       // connect to server
       socket = new Socket(IPAddress, portNumber); // ip-addr, port-num for now
@@ -81,4 +290,25 @@ public class ClientGUI {
       System.exit(1);
     }
   }
+
+  /**
+   * Parse the client's request data, and check if data is valid, if it is - make
+   * the request to the server. Otherwise indicate the error to the client window,
+   * and allow them to try sending a different request.
+   * 
+   * @param requestType - one of {POST, GET, PIN, UNPIN, CONNECT, DISCONNECT,
+   *                    SHAKE, CLEAR}
+   */
+  public void sendRequest(String requestType) {
+    // NOTE: for each request button, call this method within their actionListener
+
+    // check what request type is first, see if it matches one of the above ^
+
+    // if it matches one of the above request types, check for valid data
+
+    // if data is valid for the requested type, send request to server over socket
+
+    // else if data is invalid, send error msg to client indicating problem
+  }
+
 }
