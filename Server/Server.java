@@ -128,7 +128,7 @@ public class Server {
             } else {
               // this should send an error response back to the client
               // this is just a placeholder example for now
-              System.out.println("Invalid request type, either not recognized orunsupported.");
+              System.out.println("Invalid request type, either not recognized or unsupported.");
             }
           }
 

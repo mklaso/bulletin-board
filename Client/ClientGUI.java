@@ -12,6 +12,7 @@ public class ClientGUI {
   JFrame window;
   PrintWriter output;
   BufferedReader input;
+  String SP = " "; // used for sending requests to server
 
   public ClientGUI() {
     this.window = new JFrame();
@@ -27,6 +28,17 @@ public class ClientGUI {
     window.setVisible(true);
   }
 
+  JTextField xField = new JTextField();
+  JTextField yField = new JTextField();
+  JTextField widthField = new JTextField();
+  JTextField heightField = new JTextField();
+  JTextField msgField = new JTextField();
+  JTextField refersField = new JTextField();
+  JTextField containsField = new JTextField();
+  JTextField colourField = new JTextField();
+  JTextField xGetField = new JTextField();
+  JTextField yGetField = new JTextField();
+
   // adding all the components to GUI, setup controller logic
   public void setupGUI() {
 
@@ -40,20 +52,14 @@ public class ClientGUI {
     JLabel yLabel = new JLabel("Y Coordinate");
     JLabel widthLabel = new JLabel("Width");
     JLabel heightLabel = new JLabel("Height");
-    JTextField xField = new JTextField();
-    JTextField yField = new JTextField();
-    JTextField widthField = new JTextField();
-    JTextField heightField = new JTextField();
+
     JLabel msgLabel = new JLabel("Message");
-    JTextField msgField = new JTextField();
+
     JLabel colourLabel = new JLabel("Colour");
-    JComboBox<String> statusCombo = new JComboBox<>();
     JLabel refersLabel = new JLabel("RefersTo=");
     JLabel containsLabel = new JLabel("Contains=");
     JLabel colourLabel2 = new JLabel("Colour=");
-    JTextField refersField = new JTextField();
-    JTextField containsField = new JTextField();
-    JTextField colourField = new JTextField();
+
     JButton getBtn = new JButton("GET");
     JCheckBox allPinsCheck = new JCheckBox("ALL PINS");
     JButton shakeBtn = new JButton("SHAKE");
@@ -67,8 +73,7 @@ public class ClientGUI {
     JSeparator jSeparator3 = new JSeparator();
     JLabel xLabelGet = new JLabel("X");
     JLabel yLabelGet = new JLabel("Y");
-    JTextField xGetField = new JTextField();
-    JTextField yGetField = new JTextField();
+
     disconnectBtn.setEnabled(false);
     connectBtn.setPreferredSize(new Dimension(135, 35));
 
@@ -365,7 +370,6 @@ public class ClientGUI {
     try {
       // try to connect to server
       int portNumber = Integer.parseInt(portString);
-      // socket.setSoTimeout(1); // 5 second timeout
       Boolean connected = false;
       socket = new Socket();
       // 3 second timeout when trying to connect to wrong/invalid IP
@@ -436,24 +440,34 @@ public class ClientGUI {
     try {
       output = new PrintWriter(socket.getOutputStream(), true);
     } catch (IOException io) {
-
+      System.out.println("Could not open socket stream.");
     }
-    // NOTE: for each request button, call this method within their actionListener
-    if (requestType.equals("POST")) {
-      output.println("POST");
-    } else if (requestType.equals("GET")) {
-      output.println("GET");
-    } else if (requestType.equals("PIN")) {
-      output.println("PIN");
-    } else if (requestType.equals("UNPIN")) {
-      output.println("UNPIN");
-    } else if (requestType.equals("SHAKE")) {
-      output.println("SHAKE");
-    } else if (requestType.equals("CLEAR")) {
-      output.println("CLEAR");
-    }
-    output.flush();
 
+    try {
+      // NOTE: for each request button, call this method within their actionListener
+      if (requestType.equals("POST")) {
+        int x = Integer.parseInt(xField.getText());
+        int y = Integer.parseInt(yField.getText());
+        int width = Integer.parseInt(widthField.getText());
+        int height = Integer.parseInt(heightField.getText());
+        output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
+            + SP + msgField.getText());
+      } else if (requestType.equals("GET")) {
+        output.println(
+            requestType + SP + refersField.getText() + SP + containsField.getText() + SP + colourField.getText());
+      } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
+        int x = Integer.parseInt(xGetField.getText());
+        int y = Integer.parseInt(yGetField.getText());
+        output.println(requestType + SP + x + SP + y);
+      } else if (requestType.equals("SHAKE")) {
+        output.println(requestType);
+      } else if (requestType.equals("CLEAR")) {
+        output.println(requestType);
+      }
+      output.flush();
+    } catch (NumberFormatException nfe) {
+      displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+    }
     // check what request type is first, see if it matches one of the above ^
 
     // if it matches one of the above request types, check for valid data
