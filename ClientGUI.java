@@ -291,17 +291,19 @@ public class ClientGUI {
     connectBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        connect(IPAddrField.getText(), Integer.parseInt(portNumField.getText())); // add error checking to this later
-        connectBtn.setEnabled(false);
-        disconnectBtn.setEnabled(true);
-        connectBtn.setText("Connected");
+        Boolean isConnected = connect(IPAddrField.getText(), portNumField.getText());
+        // only apply GUI changes if client connects successfully
+        if (isConnected) {
+          connectBtn.setEnabled(false);
+          disconnectBtn.setEnabled(true);
+          connectBtn.setText("Connected");
+        }
       }
     });
 
     disconnectBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // sendRequest("DISCONNECT");
         disconnect();
       }
     });
@@ -334,6 +336,20 @@ public class ClientGUI {
       }
     });
 
+    pinBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("PIN");
+      }
+    });
+
+    unpinBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        sendRequest("UNPIN");
+      }
+    });
+
     window.pack();
   }
 
@@ -343,28 +359,44 @@ public class ClientGUI {
    * 
    * @param IPAddress  - ip address to connect to server
    * @param portNumber - port number to connect to server
+   * @return true if client connected to server, false on error
    */
-  public void connect(String IPAddress, int portNumber) {
+  public Boolean connect(String IPAddress, String portString) {
     try {
-      // connect to server
+      // try to connect to server
+      int portNumber = Integer.parseInt(portString);
       socket = new Socket(IPAddress, portNumber); // ip-addr, port-num for now
       clientOutputBox.append(" [CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
-
-      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-      clientOutputBox.append(" [SERVER]: The available note colours for use are: ");
-      // read initial server response and display to client window
-      String response;
-      while (input.ready() && (response = input.readLine()) != null) {
-        clientOutputBox.append(response + " ");
-        colourCombo.addItem(response);
+      try {
+        // socket is connected, get the accepted note colours from server
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        clientOutputBox.append(" [SERVER]: The available note colours for use are: ");
+        // read initial server response and display to client window
+        String response;
+        while (input.ready() && (response = input.readLine()) != null) {
+          clientOutputBox.append(response + " ");
+          colourCombo.addItem(response);
+        }
+        clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive.");
+      } catch (Exception e) {
+        displayErrorMsg("Server response reading error.");
+        return false;
       }
-      clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive.");
-
+    } catch (NumberFormatException nfe) {
+      displayErrorMsg("Please enter a valid port number, only integers are accepted.");
+      return false;
     } catch (Exception e) {
-      System.out.println("Problem connecting to server.\n");
-      System.exit(1);
+      displayErrorMsg("Cannot connect to the chosen IP address, or Port number, or the server is not running.");
+      return false;
     }
+    return true;
+  }
+
+  // helper method to display error msgs directly to client through popup box + on
+  // client GUI output box
+  public void displayErrorMsg(String msg) {
+    clientOutputBox.append(" [CLIENT]: " + msg + "\r\n");
+    JOptionPane.showMessageDialog(window, msg, "Alert", JOptionPane.WARNING_MESSAGE);
   }
 
   public void disconnect() {
