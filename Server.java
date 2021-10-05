@@ -21,6 +21,13 @@ public class Server {
       boardWidth = Integer.parseInt(argv[1]);
       boardHeight = Integer.parseInt(argv[2]);
 
+      // indicates there are no accepted note colours
+      if (argv.length < 4) {
+        System.out
+            .println("Error: There must be at least one note colour, please try again and supply one or more colours.");
+        System.exit(1);
+      }
+
       // 3rd argument should be start of note colour(s)
       for (int idx = 3; idx < argv.length; idx++) {
         availNoteColours.add(argv[idx]); // add specified note colours to available note colours for clients to use
@@ -111,7 +118,7 @@ public class Server {
             } else if (methodType.equals("GET")) {
               getNotes();
             } else if (methodType.equals("PIN")) {
-              pinNote();
+              pinNote(1, 1);
             } else if (methodType.equals("UNPIN")) {
               unpinNote(1, 1); // for now just so it compiles
             } else if (methodType.equals("SHAKE")) {
@@ -154,20 +161,21 @@ public class Server {
       // xCoord and yCoord come from parsed client request msg
       System.out.println("pinned note.");
       System.out.println("---------------------------------------");
-        for (Note n : bBoard.notesOnBoard) {
-          if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
-            // pin the note requested by the client, increase the number of pins by 1
-            // current note
-            n.increasePinCount();
-            n.setPinStatus("PIN");
-            System.out.println(
-                "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is pinned.");
-            System.out.println("The bulletin board now has " + n.getPinnedCount() + " pinned notes.");
-            System.out.println("---------------------------------------");
-          } else {
-            System.out.println("The note's coordinate is out of range, cannot be pinned.");
-            System.out.println("---------------------------------------");
-          }
+      for (Note n : bBoard.notesOnBoard) {
+        if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
+          // pin the note requested by the client, increase the number of pins by 1
+          // current note
+          n.increasePinCount();
+          n.setPinStatus("PIN");
+          System.out.println(
+              "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is pinned.");
+          System.out.println("The bulletin board now has " + n.getPinnedCount() + " pinned notes.");
+          System.out.println("---------------------------------------");
+        } else {
+          System.out.println("The note's coordinate is out of range, cannot be pinned.");
+          System.out.println("---------------------------------------");
+        }
+      }
     }
 
     public void unpinNote(int xCoord, int yCoord) {

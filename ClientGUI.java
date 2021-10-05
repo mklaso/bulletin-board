@@ -365,28 +365,39 @@ public class ClientGUI {
     try {
       // try to connect to server
       int portNumber = Integer.parseInt(portString);
-      socket = new Socket(IPAddress, portNumber); // ip-addr, port-num for now
-      clientOutputBox.append(" [CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
-      try {
-        // socket is connected, get the accepted note colours from server
-        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        clientOutputBox.append(" [SERVER]: The available note colours for use are: ");
-        // read initial server response and display to client window
-        String response;
-        while (input.ready() && (response = input.readLine()) != null) {
-          clientOutputBox.append(response + " ");
-          colourCombo.addItem(response);
+      // socket.setSoTimeout(1); // 5 second timeout
+      Boolean connected = false;
+      socket = new Socket();
+      // 3 second timeout when trying to connect to wrong/invalid IP
+      socket.connect(new InetSocketAddress(IPAddress, portNumber), 3000);
+      connected = true;
+      // only read from server if socket successfully connects
+      if (connected) {
+        try {
+          // socket is connected, get the accepted note colours from server
+          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          clientOutputBox.append(" [CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
+          clientOutputBox.append(" [SERVER]: The available note colours for use are: ");
+          // read initial server response and display to client window
+          String response;
+          while (input.ready() && (response = input.readLine()) != null) {
+            clientOutputBox.append(response + " ");
+            colourCombo.addItem(response);
+          }
+          clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive.");
+        } catch (Exception e) {
+          displayErrorMsg("Server response reading error.");
+          return false;
         }
-        clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive.");
-      } catch (Exception e) {
-        displayErrorMsg("Server response reading error.");
-        return false;
       }
     } catch (NumberFormatException nfe) {
       displayErrorMsg("Please enter a valid port number, only integers are accepted.");
       return false;
+    } catch (SocketTimeoutException ste) {
+      displayErrorMsg("Could not connect to the port or IP address in reasonable time.");
+      return false;
     } catch (Exception e) {
-      displayErrorMsg("Cannot connect to the chosen IP address, or Port number, or the server is not running.");
+      displayErrorMsg("Invalid IP address/port number, or the server is not running.");
       return false;
     }
     return true;
@@ -396,7 +407,7 @@ public class ClientGUI {
   // client GUI output box
   public void displayErrorMsg(String msg) {
     clientOutputBox.append(" [CLIENT]: " + msg + "\r\n");
-    JOptionPane.showMessageDialog(window, msg, "Alert", JOptionPane.WARNING_MESSAGE);
+    JOptionPane.showMessageDialog(window, msg, "Error Alert", JOptionPane.WARNING_MESSAGE);
   }
 
   public void disconnect() {
