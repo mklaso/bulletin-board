@@ -148,8 +148,20 @@ public class Server {
       }
     }
 
-    public void createNote() {
+    public void createNote(String S) {
       System.out.println("created note.");
+      System.out.println("---------------------------------------------");
+      String[] SSplit = S.split(",", 6);
+
+			Note note = new Note(SSplit[0], SSplit[1],
+					Integer.parseInt(SSplit[2]), Integer.parseInt(textSplit[3]),Integer.parseInt(textSplit[4]),Integer.parseInt(textSplit[5]),false,0);
+			
+      bBoard.notesOnBoard.add(note);
+
+			System.out.println("New note x-coordinate: " + note.getXCoord() + "  y-coordinate: " + note.getYCoord()
+					+ "  height " + note.gHeight() + "  width: " + note.getWidth()
+					+ "  colour: " + note.getNoteColour() + "  message: " + note.getMessage() + " is succesfully created.");
+			System.out.println("---------------------------------------------");
 
     }
 
