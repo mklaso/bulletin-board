@@ -459,8 +459,13 @@ public class ClientGUI {
           int y = Integer.parseInt(yField.getText());
           int width = Integer.parseInt(widthField.getText());
           int height = Integer.parseInt(heightField.getText());
-          output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
-              + SP + msgField.getText());
+
+          if (x < 0 || y < 0) {
+            displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
+          } else {
+            output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
+                + SP + msgField.getText());
+          }
 
         } catch (NumberFormatException nfe) {
           displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
@@ -496,7 +501,12 @@ public class ClientGUI {
       try {
         int x = Integer.parseInt(xGetField.getText());
         int y = Integer.parseInt(yGetField.getText());
-        output.println(requestType + SP + x + SP + y);
+
+        if (x < 0 || y < 0) {
+          displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
+        } else {
+          output.println(requestType + SP + x + SP + y);
+        }
       } catch (NumberFormatException nfe) {
         displayErrorMsg("Please enter a valid integer number for both x, and y.");
       }
