@@ -12,7 +12,7 @@ public class Note {
     this.width = width;
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
-    this.pinnedCount = 0;
+    this.pinnedCount = 0; // starts with 0 pinned note
   }
 
   /**
@@ -35,15 +35,10 @@ public class Note {
       this.pinnedCount--;
     }
   }
-  
-  public void increasePinCount() {
-    if (this.pinnedCount == 0) {
-      this.pinnedCount = 1;
-    } else {
-      this.pinnedCount++;
-    }
-  }
 
+  public void increasePinCount() {
+    this.pinnedCount++;
+  }
 
   // note setters
   public void setXCoord(int xCoord) {
