@@ -162,7 +162,7 @@ public class Server {
       System.out.println("pinned note.");
       System.out.println("---------------------------------------");
       for (Note n : bBoard.notesOnBoard) {
-        if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
+        if (0 < n.getXCoord() <= xCoord && 0 < n.getYCoord() <= yCoord) {
           // pin the note requested by the client, increase the number of pins by 1
           // current note
           n.increasePinCount();
