@@ -156,17 +156,24 @@ public class Server {
     }
 
     public void createNote(int x, int y, int width, int height, String colour, String msg) {
-      serverStatusCode = " 201 - Created";
-      serverReasonPhrase = "Note was successfully created. ";
 
-      Note note = new Note(x, y, width, height, colour, msg);
-      bBoard.notesOnBoard.add(note);
+      if (x < 0 || x > bBoard.width || y < 0 || y > bBoard.height) {
+        serverStatusCode = "400 - Bad Request";
+        serverReasonPhrase = "Note could not be created.";
+        outputMsg += "Note coordinates are outside the bulletin board area. Try again after changing the x,y coordinates of the note.";
+      } else {
+        serverStatusCode = " 201 - Created";
+        serverReasonPhrase = "Note was successfully created. ";
 
-      outputMsg += "A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
-          + "), width: " + note.getWidth() + ", height: " + note.getHeight() + ", colour: " + note.getNoteColour()
-          + ", message: \"" + note.getMessage() + "\" was successfully created.";
+        Note note = new Note(x, y, width, height, colour, msg);
+        bBoard.notesOnBoard.add(note);
 
-      System.out.println(outputMsg);
+        outputMsg += "A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
+            + "), width: " + note.getWidth() + ", height: " + note.getHeight() + ", colour: " + note.getNoteColour()
+            + ", message: \"" + note.getMessage() + "\" was successfully created.";
+
+        System.out.println(outputMsg);
+      }
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
@@ -352,8 +359,8 @@ public class Server {
       serverReasonPhrase = "CLEAR request was successfully interprested and all the unpinned notes were successfully removed.";
       System.out.println("Removing unpinned notes.");
       for (Note n : bBoard.notesOnBoard) {
-         bBoard.notesOnBoard.remove(n);
-         System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
+        bBoard.notesOnBoard.remove(n);
+        System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
             + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
       }
     }
