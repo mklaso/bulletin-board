@@ -12,5 +12,6 @@ public class BulletinBoard {
     this.width = width;
     this.height = height;
     this.notesOnBoard = notesOnBoard;
+    this.pinnedCount = 0; //starts with 0 pinned note
   }
 }
