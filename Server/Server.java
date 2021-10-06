@@ -156,8 +156,7 @@ public class Server {
     }
 
     public void createNote(int x, int y, int width, int height, String colour, String msg) {
-
-      serverStatusCode = " 200 - OK";
+      serverStatusCode = " 201 - Created";
       serverReasonPhrase = "Note was successfully created. ";
 
       Note note = new Note(x, y, width, height, colour, msg);
@@ -171,7 +170,7 @@ public class Server {
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
-      serverStatusCode = " 201 - Created";
+      serverStatusCode = " 200 - OK";
       serverReasonPhrase = "GET request was successfully interprested and the note is successfully found. ";
       // type 1 request - all pins
       if (type == 1) {
@@ -288,7 +287,8 @@ public class Server {
     }
 
     public void pinNote(int xCoord, int yCoord) {
-
+      serverStatusCode = " 200 - OK";
+      serverReasonPhrase = "PIN request was successfully interprested and the note is successfully pinned.";
       System.out.println("Pinned note.");
       for (Note n : bBoard.notesOnBoard) {
         if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
@@ -307,7 +307,8 @@ public class Server {
 
     public void unpinNote(int xCoord, int yCoord) {
       // xCoord and yCoord come from parsed client request msg
-
+      serverStatusCode = " 200 - OK";
+      serverReasonPhrase = "UNPIN request was successfully interprested and the note is successfully unpinned.";
       for (Note n : bBoard.notesOnBoard) {
         if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getPinnedCount() > 1) {
           // unpin the note requested by the client, lower pins if more than 1 pin on
@@ -330,7 +331,8 @@ public class Server {
     }
 
     public void shakeBoard() {
-
+      serverStatusCode = " 200 - OK";
+      serverReasonPhrase = "SHAKE request was successfully interprested and all the notes were successfully removed.";
       System.out.println("Removing all the notes.");
       for (Note n : bBoard.notesOnBoard) {
         bBoard.notesOnBoard.remove(n);
@@ -340,7 +342,8 @@ public class Server {
     }
 
     public void clearBoard() {
-
+      serverStatusCode = " 200 - OK";
+      serverReasonPhrase = "CLEAR request was successfully interprested and all the unpinned notes were successfully removed.";
       System.out.println("Removing unpinned notes.");
       for (Note n : bBoard.notesOnBoard) {
         if (!n.getPinStatus()) {
