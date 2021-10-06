@@ -4,7 +4,7 @@ public class Note {
   private int xCoord, yCoord, width, height, pinnedCount;
   private Boolean isPinned;
 
-  public Note(String message, String noteColour, int xCoord, int yCoord, int width, int height) {
+  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message) {
     this.message = message;
     this.noteColour = noteColour;
     this.xCoord = xCoord;

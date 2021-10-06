@@ -11,7 +11,7 @@ public class ClientGUI {
   JFrame window;
   PrintWriter output;
   BufferedReader input;
-  String SP = " "; // used for sending requests to server
+  String SP = "_"; // used for sending requests to server
 
   public ClientGUI() {
     this.window = new JFrame();
