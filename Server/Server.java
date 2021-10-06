@@ -153,8 +153,85 @@ public class Server {
 
     }
 
-    public void getNotes() {
+    public void getNotes(String contains, String refers, String colour ) {
       System.out.println("got notes.");
+      System.out.println("---------------------------------------");
+      int XCoord = 0;
+      int YCoord = 0;
+      
+      boolean colour_exists = true;
+      boolean refers_exists = true;
+      boolean coord_exits = true;
+      
+      if (contains.equals(""))
+          //empty coordinates
+          coord_exists = false;
+      else {
+        //convert the string that contains the coordinates into a pair of (x,y)
+        String[] coord = contains.split(" ");
+        XCoord = Integer.parseInt(coord[0]);
+        YCoord = Integer.parseInt(coord[1]);
+      }
+      
+      if (colour.equals(""))
+          //empty colour 
+          colour_exists = false;
+      if (refers.equals(""))
+          //empty search string target
+          refers_exists = false;
+      
+      //matching coordinate
+      if (coord_exists && !refers_exists && ! colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }
+      
+      //matching colour
+      else if (!coord_exists && !refers_exists && colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getNoteColour().equals(colour)) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }
+      //matching search string 
+      else if (!coord_exists && refers_exists && !colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }
+      
+      //matching coordinate and search string
+      else if (coord_exists && refers_exists && !colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }
+      
+      //matching coordinate and colour on the board
+      else if (coord_exists && !refers_exists && colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getNoteColour().equals(colour)) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }
+      
+      //matching search string and colour 
+      else if (!coord_exists && refers_exists && colour_exists) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (&& n.getNoteColour().equals(colour) && (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
+              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
+            }
+          }
+      }    
     }
 
     public void pinNote(int xCoord, int yCoord) {
@@ -162,7 +239,7 @@ public class Server {
       System.out.println("pinned note.");
       System.out.println("---------------------------------------");
       for (Note n : bBoard.notesOnBoard) {
-        if (0 < n.getXCoord() <= xCoord && 0 < n.getYCoord() <= yCoord) {
+        if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
           // pin the note requested by the client, increase the number of pins by 1
           // current note
           n.increasePinCount();
