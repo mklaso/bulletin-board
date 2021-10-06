@@ -388,7 +388,7 @@ public class ClientGUI {
             clientOutputBox.append(response + " ");
             colourCombo.addItem(response);
           }
-          clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive.");
+          clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive. \n");
         } catch (Exception e) {
           displayErrorMsg("Server response reading error.");
           return false;
@@ -512,14 +512,27 @@ public class ClientGUI {
     } else if (requestType.equals("CLEAR")) {
       output.println(requestType);
     }
-    output.flush();
 
     // call on readServerResponse method here?
-    // readServerResponse();
+    readServerResponse();
+
   }
 
   public void readServerResponse() {
     // read from server (input)
+
     // output response to GUI window
+    System.out.println("in read server response.");
+    try {
+      // socket is connected, get the accepted note colours from server
+      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      // read initial server response and display to client window
+      String response = input.readLine();
+      clientOutputBox.append(" [SERVER]:" + response + "\n");
+
+    } catch (Exception e) {
+      displayErrorMsg("Server response reading error.");
+    }
+
   }
 }

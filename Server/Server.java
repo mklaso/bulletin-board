@@ -77,6 +77,7 @@ public class Server {
     // successfully."]
     private String serverResponseMsg = ""; // combination of the two above [e.g "201 - Created, Note was created
     // successfully."]
+    private String outputMsg = "";
     private BufferedReader input;
     private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
@@ -97,11 +98,11 @@ public class Server {
         for (int idx = 0; idx < availNoteColours.size(); idx++) {
           output.println(availNoteColours.get(idx)); // send client what note colours are available
         }
-        output.flush();
 
         // keep checking for client requests while client is connected to server
         String response;
-        while ((response = input.readLine()) != null) { // not the right condition, should be something else
+        while ((response = input.readLine()) != null) {
+          output = new PrintWriter(socket.getOutputStream(), true);
           synchronized (lock) {
             // critical section
 
@@ -134,10 +135,13 @@ public class Server {
             } else if (methodType.equals("CLEAR")) {
               clearBoard();
             }
-            // now send the serverResponseMsg back to the client socket
-            serverResponseMsg = serverStatusCode + serverReasonPhrase;
-            output.println(serverResponseMsg + "\r\n");
+
           }
+          // now send the serverResponseMsg back to the client socket
+          serverResponseMsg = serverStatusCode + ": " + serverReasonPhrase + outputMsg;
+          output.println(serverResponseMsg + "\n");
+
+          outputMsg = "";
         }
         disconnectClient();
       } catch (IOException io) {
@@ -153,14 +157,17 @@ public class Server {
 
     public void createNote(int x, int y, int width, int height, String colour, String msg) {
 
+      serverStatusCode = " 201 - Created";
+      serverReasonPhrase = "Note was successfully created. ";
+
       Note note = new Note(x, y, width, height, colour, msg);
       bBoard.notesOnBoard.add(note);
 
-      System.out.println("A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
+      outputMsg += "A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
           + "), height: " + note.getHeight() + ", width: " + note.getWidth() + ", colour: " + note.getNoteColour()
-          + ", message: \"" + note.getMessage() + "\" was succesfully created.");
-      System.out.println("---------------------------------------------");
+          + ", message: \"" + note.getMessage() + "\" was successfully created.";
 
+      System.out.println(outputMsg);
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
@@ -214,6 +221,9 @@ public class Server {
             }
           }
         }
+
+        // error on these, something wrong with if statement in for loop
+
         // matching search string
         // else if (!coord_exists && refers_exists && !colour_exists) {
         // for (Note n : bBoard.notesOnBoard) {
@@ -224,6 +234,8 @@ public class Server {
         // }
         // }
         // }
+
+        // error on these, something wrong with if statement in for loop
 
         // matching coordinate and search string
         // else if (coord_exists && refers_exists && !colour_exists) {
@@ -247,6 +259,8 @@ public class Server {
           }
         }
 
+        // error on these, something wrong with if statement in for loop
+
         // matching search string and colour
         // else if (!coord_exists && refers_exists && colour_exists) {
         // for (Note n : bBoard.notesOnBoard) {
@@ -266,8 +280,7 @@ public class Server {
 
     public void pinNote(int xCoord, int yCoord) {
 
-      System.out.println("pinned note.");
-      System.out.println("---------------------------------------");
+      System.out.println("Pinned note.");
       for (Note n : bBoard.notesOnBoard) {
         if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
           // pin the note requested by the client, increase the number of pins by 1
@@ -276,11 +289,9 @@ public class Server {
           n.setPinStatus("PIN");
           System.out
               .println("Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + ") is pinned.");
-          System.out.println("This note has been pinned" + n.getPinnedCount() + "time(s).");
-          System.out.println("---------------------------------------");
+          System.out.println("This note has been pinned " + n.getPinnedCount() + " time(s).");
         } else {
           System.out.println("The note's coordinate is out of range, cannot be pinned.");
-          System.out.println("---------------------------------------");
         }
       }
     }
@@ -288,7 +299,6 @@ public class Server {
     public void unpinNote(int xCoord, int yCoord) {
       // xCoord and yCoord come from parsed client request msg
 
-      System.out.println("---------------------------------------");
       for (Note n : bBoard.notesOnBoard) {
         if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getPinnedCount() > 1) {
           // unpin the note requested by the client, lower pins if more than 1 pin on
@@ -298,34 +308,30 @@ public class Server {
           System.out.println(
               "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is unpinned.");
           System.out.println("The bulletin board still has " + n.getPinnedCount() + " pinned note(s). ");
-          System.out.println("---------------------------------------");
         } else if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getPinnedCount() == 1) {
           // unpin the only pinned note
           n.lowerPinCount();
           n.setPinStatus("UNPIN");
           System.out.println("The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord()
               + "," + n.getYCoord() + "), width: " + n.getWidth() + ", height: " + n.getHeight() + " was unpinned.");
-          System.out.println("---------------------------------------");
         } else {
           System.out.println("The note is not pinned, unable to unpin it.");
-          System.out.println("---------------------------------------");
         }
       }
     }
 
     public void shakeBoard() {
-      System.out.println("---------------------------------------");
+
       System.out.println("Removing all the notes.");
       for (Note n : bBoard.notesOnBoard) {
         bBoard.notesOnBoard.remove(n);
         System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
             + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
       }
-      System.out.println("---------------------------------------");
     }
 
     public void clearBoard() {
-      System.out.println("---------------------------------------");
+
       System.out.println("Removing unpinned notes.");
       for (Note n : bBoard.notesOnBoard) {
         if (!n.getPinStatus()) {
@@ -335,7 +341,6 @@ public class Server {
                   + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
         }
       }
-      System.out.println("---------------------------------------");
     }
 
     public void disconnectClient() throws IOException {
