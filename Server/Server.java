@@ -157,7 +157,7 @@ public class Server {
 
     public void createNote(int x, int y, int width, int height, String colour, String msg) {
 
-      serverStatusCode = " 201 - Created";
+      serverStatusCode = " 200 - OK";
       serverReasonPhrase = "Note was successfully created. ";
 
       Note note = new Note(x, y, width, height, colour, msg);
@@ -171,12 +171,14 @@ public class Server {
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
+      serverStatusCode = " 201 - Created";
+      serverReasonPhrase = "GET request was successfully interprested and the note is successfully found. ";
       // type 1 request - all pins
       if (type == 1) {
         for (Note n : bBoard.notesOnBoard) {
           if (n.getPinStatus() == true) {
-            output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                + n.getNoteColour() + " colour" + " has a message: " + n.getMessage());
+            outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
+                + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
           }
         }
       }
@@ -206,8 +208,8 @@ public class Server {
         if (coord_exists && !refers_exists && !colour_exists) {
           for (Note n : bBoard.notesOnBoard) {
             if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage());
+              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
+                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
             }
           }
         }
@@ -216,8 +218,8 @@ public class Server {
         else if (!coord_exists && !refers_exists && colour_exists) {
           for (Note n : bBoard.notesOnBoard) {
             if (n.getNoteColour().equals(colour)) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage());
+              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
+                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
             }
           }
         }
@@ -228,9 +230,9 @@ public class Server {
         // else if (!coord_exists && refers_exists && !colour_exists) {
         // for (Note n : bBoard.notesOnBoard) {
         // if (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-        // output.println("Note with x-coordinate: " + n.getXCoord() + " and
+        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
-        // has a message: " + n.getMessage());
+        // has a message: " + n.getMessage();
         // }
         // }
         // }
@@ -240,11 +242,11 @@ public class Server {
         // matching coordinate and search string
         // else if (coord_exists && refers_exists && !colour_exists) {
         // for (Note n : bBoard.notesOnBoard) {
-        // if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord &&
+        // if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && 
         // (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-        // output.println("Note with x-coordinate: " + n.getXCoord() + " and
+        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
-        // has a message: " + n.getMessage());
+        // has a message: " + n.getMessage();
         // }
         // }
         // }
@@ -253,8 +255,8 @@ public class Server {
         else if (coord_exists && !refers_exists && colour_exists) {
           for (Note n : bBoard.notesOnBoard) {
             if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord && n.getNoteColour().equals(colour)) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage());
+              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
+                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
             }
           }
         }
@@ -266,9 +268,9 @@ public class Server {
         // for (Note n : bBoard.notesOnBoard) {
         // if (&& n.getNoteColour().equals(colour) && (n.getMessage().indexOf(refers) !=
         // -1 ? true : false) == true) {
-        // output.println("Note with x-coordinate: " + n.getXCoord() + " and
+        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is "
-        // + n.getNoteColour() + " colour" + " has a message: " + n.getMessage());
+        // + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
         // }
         // }
         // }
