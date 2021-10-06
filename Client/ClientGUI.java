@@ -3,7 +3,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.*;
 
 public class ClientGUI {
   private Socket socket;
@@ -38,6 +37,7 @@ public class ClientGUI {
   JTextField colourField = new JTextField();
   JTextField xGetField = new JTextField();
   JTextField yGetField = new JTextField();
+  JCheckBox allPinsCheck = new JCheckBox("ALL PINS");
 
   // adding all the components to GUI, setup controller logic
   public void setupGUI() {
@@ -61,7 +61,7 @@ public class ClientGUI {
     JLabel colourLabel2 = new JLabel("Colour=");
 
     JButton getBtn = new JButton("GET");
-    JCheckBox allPinsCheck = new JCheckBox("ALL PINS");
+
     JButton shakeBtn = new JButton("SHAKE");
     JButton clearBtn = new JButton("CLEAR");
     JScrollPane jScrollPane1 = new JScrollPane();
@@ -438,43 +438,81 @@ public class ClientGUI {
    */
   public void sendRequest(String requestType) {
     try {
+      // for writing request to server
       output = new PrintWriter(socket.getOutputStream(), true);
     } catch (IOException io) {
       System.out.println("Could not open socket stream.");
     }
 
-    try {
-      // NOTE: for each request button, call this method within their actionListener
-      if (requestType.equals("POST")) {
-        int x = Integer.parseInt(xField.getText());
-        int y = Integer.parseInt(yField.getText());
-        int width = Integer.parseInt(widthField.getText());
-        int height = Integer.parseInt(heightField.getText());
-        output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
-            + SP + msgField.getText());
-      } else if (requestType.equals("GET")) {
-        output.println(
-            requestType + SP + refersField.getText() + SP + containsField.getText() + SP + colourField.getText());
-      } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
+    if (requestType.equals("POST")) {
+      Boolean valid = true;
+      // check for missing info from user
+      if (xField.getText().equals("") || yField.getText().equals("") || widthField.getText().equals("")
+          || heightField.getText().equals("") || msgField.getText().equals("")) {
+        valid = false;
+        displayErrorMsg("One or more fields do not have a specified value, or message is empty.");
+      }
+      // check for valid number values
+      if (valid) {
+        try {
+          int x = Integer.parseInt(xField.getText());
+          int y = Integer.parseInt(yField.getText());
+          int width = Integer.parseInt(widthField.getText());
+          int height = Integer.parseInt(heightField.getText());
+          output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
+              + SP + msgField.getText());
+
+        } catch (NumberFormatException nfe) {
+          displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+        }
+      }
+
+    } else if (requestType.equals("GET")) {
+      // gets all pins coordinates on board
+      String getType; // get request has two forms
+      String refers = refersField.getText();
+      String contains = containsField.getText();
+      String colour = colourField.getText();
+
+      // empty value indicates all for that input
+      if (refers.equals("")) {
+        refers = "ALL";
+      }
+      if (contains.equals("")) {
+        contains = "ALL";
+      }
+      if (colour.equals("")) {
+        colour = "ALL";
+      }
+
+      if (allPinsCheck.isSelected()) {
+        getType = "0";
+        output.println(requestType + getType + SP + "PINS"); // request type 1
+      } else {
+        getType = "1";
+        output.println(requestType + getType + SP + refers + SP + contains + SP + colour); // request type 2
+      }
+    } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
+      try {
         int x = Integer.parseInt(xGetField.getText());
         int y = Integer.parseInt(yGetField.getText());
         output.println(requestType + SP + x + SP + y);
-      } else if (requestType.equals("SHAKE")) {
-        output.println(requestType);
-      } else if (requestType.equals("CLEAR")) {
-        output.println(requestType);
+      } catch (NumberFormatException nfe) {
+        displayErrorMsg("Please enter a valid integer number for both x, and y.");
       }
-      output.flush();
-    } catch (NumberFormatException nfe) {
-      displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+    } else if (requestType.equals("SHAKE")) {
+      output.println(requestType);
+    } else if (requestType.equals("CLEAR")) {
+      output.println(requestType);
     }
-    // check what request type is first, see if it matches one of the above ^
+    output.flush();
 
-    // if it matches one of the above request types, check for valid data
-
-    // if data is valid for the requested type, send request to server over socket
-
-    // else if data is invalid, send error msg to client indicating problem
+    // call on readServerResponse method here?
+    // readServerResponse();
   }
 
+  public void readServerResponse() {
+    // read from server (input)
+    // output response to GUI window
+  }
 }
