@@ -520,9 +520,7 @@ public class ClientGUI {
 
   public void readServerResponse() {
     // read from server (input)
-
     // output response to GUI window
-    System.out.println("in read server response.");
     try {
       // socket is connected, get the accepted note colours from server
       input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
