@@ -474,7 +474,6 @@ public class ClientGUI {
 
     } else if (requestType.equals("GET")) {
       // gets all pins coordinates on board
-      String getType; // get request has two forms
       String refers = refersField.getText();
       String contains = containsField.getText();
       String colour = colourField.getText();
@@ -491,11 +490,9 @@ public class ClientGUI {
       }
 
       if (allPinsCheck.isSelected()) {
-        getType = "0";
-        output.println(requestType + getType + SP + "PINS"); // request type 1
+        output.println(requestType + SP + "PINS"); // request type 1
       } else {
-        getType = "1";
-        output.println(requestType + getType + SP + refers + SP + contains + SP + colour); // request type 2
+        output.println(requestType + SP + refers + SP + contains + SP + colour); // request type 2
       }
     } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
       try {

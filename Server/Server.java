@@ -104,37 +104,38 @@ public class Server {
         while ((response = input.readLine()) != null) { // not the right condition, should be something else
           synchronized (lock) {
             // critical section
-            methodType = response; // just for now, eventually will need to parse the reponse string, can tokenize
-                                   // on spaces, where first token is always the methodType, and the rest of the
-                                   // tokens are arguments for the methods
+            System.out.println("Client request looks like: " + response);
 
             // read input (request message) from client, parse it, then service it
+            String[] requestData = response.split(" ");
+            methodType = requestData[0];
 
-            serverStatusCode = "200"; // default "OK" message, only 201 for POST
-            serverReasonPhrase = " - OK: WORKING (FOR TESTING PURPOSES CURRENTLY)";
+            for (int i = 0; i < requestData.length; i++) {
+              System.out.println("arg " + i + ": " + requestData[i]);
+            }
+
             if (methodType.equals("POST")) {
-              createNote();
-              serverStatusCode = "201";
+              createNote(requestData[1], requestData[2], requestData[3], requestData[4], requestData[5],
+                  requestData[6]);
             } else if (methodType.equals("GET")) {
-              getNotes();
+              if (requestData.length == 2) {
+                getNotes("", "", "", 1);
+              } else {
+                getNotes(requestData[1], requestData[2], requestData[3], 2);
+              }
             } else if (methodType.equals("PIN")) {
-              pinNote(1, 1);
+              pinNote(requestData[1], requestData[2]);
             } else if (methodType.equals("UNPIN")) {
-              unpinNote(1, 1); // for now just so it compiles
+              unpinNote(requestData[1], requestData[2]);
             } else if (methodType.equals("SHAKE")) {
               shakeBoard();
             } else if (methodType.equals("CLEAR")) {
               clearBoard();
-            } else {
-              // this should send an error response back to the client
-              // this is just a placeholder example for now
-              System.out.println("Invalid request type, either not recognized or unsupported.");
             }
+            // now send the serverResponseMsg back to the client socket
+            serverResponseMsg = serverStatusCode + serverReasonPhrase;
+            output.println(serverResponseMsg + "\r\n");
           }
-
-          // now send the serverResponseMsg back to the client socket
-          serverResponseMsg = serverStatusCode + serverReasonPhrase;
-          output.println(serverResponseMsg + "\r\n");
         }
         disconnectClient();
       } catch (IOException io) {
@@ -150,91 +151,10 @@ public class Server {
 
     public void createNote() {
       System.out.println("created note.");
-
-    }
-
-    public void getNotes(String contains, String refers, String colour ) {
-      System.out.println("got notes.");
-      System.out.println("---------------------------------------");
-      int XCoord = 0;
-      int YCoord = 0;
-      
-      boolean colour_exists = true;
-      boolean refers_exists = true;
-      boolean coord_exits = true;
-      
-      if (contains.equals(""))
-          //empty coordinates
-          coord_exists = false;
-      else {
-        //convert the string that contains the coordinates into a pair of (x,y)
-        String[] coord = contains.split(" ");
-        XCoord = Integer.parseInt(coord[0]);
-        YCoord = Integer.parseInt(coord[1]);
-      }
-      
-      if (colour.equals(""))
-          //empty colour 
-          colour_exists = false;
-      if (refers.equals(""))
-          //empty search string target
-          refers_exists = false;
-      
-      //matching coordinate
-      if (coord_exists && !refers_exists && ! colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }
-      
-      //matching colour
-      else if (!coord_exists && !refers_exists && colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getNoteColour().equals(colour)) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }
-      //matching search string 
-      else if (!coord_exists && refers_exists && !colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }
-      
-      //matching coordinate and search string
-      else if (coord_exists && refers_exists && !colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }
-      
-      //matching coordinate and colour on the board
-      else if (coord_exists && !refers_exists && colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getNoteColour().equals(colour)) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }
-      
-      //matching search string and colour 
-      else if (!coord_exists && refers_exists && colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (&& n.getNoteColour().equals(colour) && (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-              output.println("Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + "is " + n.getNoteColour() + " colour" +" has a message: " + n.getMessage());
-            }
-          }
-      }    
     }
 
     public void pinNote(int xCoord, int yCoord) {
+
       // xCoord and yCoord come from parsed client request msg
       System.out.println("pinned note.");
       System.out.println("---------------------------------------");
@@ -264,9 +184,10 @@ public class Server {
           // unpin the note requested by the client, lower pins if more than 1 pin on
           // current note
           n.lowerPinCount();
+
           System.out.println(
               "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is unpinned.");
-          System.out.println("The bulletin board still has " + n.getPinnedCount() + " pinned notes.");
+          System.out.println("The bulletin board still has " + n.getPinnedCount() + " pinned notes. ");
           System.out.println("---------------------------------------");
         } else if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord && n.getPinnedCount() == 1) {
           // unpin the only pinned note
