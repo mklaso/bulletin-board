@@ -4,7 +4,7 @@ public class Note {
   private int xCoord, yCoord, width, height, pinnedCount;
   private Boolean isPinned;
 
-  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message) {
+  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message, ArrayList<Integer> pinList) {
     this.message = message;
     this.noteColour = noteColour;
     this.xCoord = xCoord;
@@ -13,6 +13,7 @@ public class Note {
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
     this.pinnedCount = 0; // starts with 0 pinned note
+    this.pinList = new ArraryList<Integer>();
   }
 
   /**
