@@ -335,9 +335,12 @@ public class Server {
       serverReasonPhrase = "SHAKE request was successfully interprested and all the notes were successfully removed.";
       System.out.println("Removing all the notes.");
       for (Note n : bBoard.notesOnBoard) {
-        bBoard.notesOnBoard.remove(n);
-        System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
-            + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
+        if (!n.getPinStatus()) {
+          bBoard.notesOnBoard.remove(n);
+          System.out
+              .println(n.getNoteColour() + " unpinned note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
+                  + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
+        }
       }
     }
 
@@ -346,12 +349,9 @@ public class Server {
       serverReasonPhrase = "CLEAR request was successfully interprested and all the unpinned notes were successfully removed.";
       System.out.println("Removing unpinned notes.");
       for (Note n : bBoard.notesOnBoard) {
-        if (!n.getPinStatus()) {
-          bBoard.notesOnBoard.remove(n);
-          System.out
-              .println(n.getNoteColour() + " unpinned note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
-                  + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
-        }
+         bBoard.notesOnBoard.remove(n);
+         System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
+            + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
       }
     }
 
