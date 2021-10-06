@@ -179,6 +179,7 @@ public class Server {
           if (n.getPinStatus() == true) {
             outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
                 + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+            System.out.println(outputMsg);
           }
         }
       }
@@ -210,6 +211,7 @@ public class Server {
             if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord) {
               outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
                   + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+              System.out.println(outputMsg);
             }
           }
         }
@@ -220,6 +222,7 @@ public class Server {
             if (n.getNoteColour().equals(colour)) {
               outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
                   + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+              System.out.println(outputMsg);
             }
           }
         }
@@ -233,6 +236,7 @@ public class Server {
         // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
         // has a message: " + n.getMessage();
+        // System.out.println(outputMsg);
         // }
         // }
         // }
@@ -247,6 +251,7 @@ public class Server {
         // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
         // has a message: " + n.getMessage();
+        // System.out.println(outputMsg);
         // }
         // }
         // }
@@ -257,6 +262,7 @@ public class Server {
             if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord && n.getNoteColour().equals(colour)) {
               outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
                   + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+              System.out.println(outputMsg);
             }
           }
         }
@@ -271,6 +277,7 @@ public class Server {
         // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
         // y-coordinate: " + n.getYCoord() + " is "
         // + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+        // System.out.println(outputMsg);
         // }
         // }
         // }
