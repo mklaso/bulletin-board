@@ -12,7 +12,6 @@ public class Note {
     this.width = width;
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
-    this.pinnedCount = 0;
   }
 
   /**
