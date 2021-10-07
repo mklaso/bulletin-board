@@ -302,6 +302,7 @@ public class Server {
             && yCoord <= n.getYCoord() + n.getHeight()) {
           // pin the note requested by the client, increase the number of pins by 1
           // current note
+          n.addTopinList(int xCoord, int yCoord)
           n.increasePinCount();
           n.setPinStatus("PIN");
           System.out
@@ -323,7 +324,7 @@ public class Server {
           // unpin the note requested by the client, lower pins if more than 1 pin on
           // current note
           n.lowerPinCount();
-
+          n.removeFrompinList(int xCoord, int yCoord);
           System.out.println(
               "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is unpinned.");
           System.out.println("The bulletin board still has " + n.getPinnedCount() + " pinned note(s). ");
@@ -332,6 +333,7 @@ public class Server {
           // unpin the only pinned note
           n.lowerPinCount();
           n.setPinStatus("UNPIN");
+          removeFrompinList(int xCoord, int yCoord);
           System.out.println("The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord()
               + "," + n.getYCoord() + "), width: " + n.getWidth() + ", height: " + n.getHeight() + " was unpinned.");
         } else {
