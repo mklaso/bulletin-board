@@ -133,10 +133,10 @@ public class Server {
             }
             // now send the serverResponseMsg back to the client socket
             serverResponseMsg = serverStatusCode + ": " + serverReasonPhrase + outputMsg;
-            output.println(serverResponseMsg);
+            output.println("[SERVER]: " + serverResponseMsg);
 
+            // reset output msg for the next request
             outputMsg = "";
-
           }
         }
         disconnectClient();
@@ -147,7 +147,7 @@ public class Server {
           System.out.println("Socket already closed.");
         }
       } catch (Exception e) {
-        // fill in later
+        System.out.println("Unexpected error has occurred.");
       }
     }
 
@@ -155,10 +155,10 @@ public class Server {
 
       if (x < 0 || x > bBoard.width || y < 0 || y > bBoard.height) {
         serverStatusCode = "400 - Bad Request";
-        serverReasonPhrase = "Note could not be created.";
-        outputMsg += "Note coordinates are outside the bulletin board area. Try again after changing the x,y coordinates of the note.";
+        serverReasonPhrase = "Note could not be created. ";
+        outputMsg += "Note coordinates are outside the bulletin board area. Try again after changing the x,y coordinates of the note. ";
       } else {
-        serverStatusCode = " 201 - Created";
+        serverStatusCode = "201 - Created";
         serverReasonPhrase = "Note was successfully created. ";
 
         Note note = new Note(x, y, width, height, colour, msg);
@@ -166,19 +166,20 @@ public class Server {
 
         outputMsg += "A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
             + "), width: " + note.getWidth() + ", height: " + note.getHeight() + ", colour: " + note.getNoteColour()
-            + ", message: \"" + note.getMessage() + "\" was successfully created.";
+            + ", message: \"" + note.getMessage() + "\" was created.";
       }
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
-      serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "GET request was successful and the note(s) have been found.";
       // type 1 request - all pins
       if (type == 1) {
+        serverStatusCode = "200 - OK";
+        serverReasonPhrase = "GET request was successful and notes have been found.";
+
         for (Note n : bBoard.notesOnBoard) {
           if (n.getPinStatus() == true) {
-            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + "), colour: "
-                + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             System.out.println(outputMsg);
           }
         }
@@ -213,51 +214,54 @@ public class Server {
           refersAll = true;
         }
 
+        serverStatusCode = "200 - OK";
+        serverReasonPhrase = "GET request was successful and notes have been found. ";
+
         // ALL - every note on board
         if (coordsAll && coloursAll && refersAll) {
           for (Note n : bBoard.notesOnBoard) {
-            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + "), colour: "
-                + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
           }
           // specific coords, specific colour, specific refers
         } else if (!coordsAll && !coloursAll && !refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && (colour.equals(n.getNoteColour()))
                 && n.getMessage().contains(refers)) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
           // specific coords, all colours, all refers
         } else if (!coordsAll && coloursAll && refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if (XCoord == n.getXCoord() && YCoord == n.getYCoord()) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
           // all coords, specific colour, all refers
         } else if (coordsAll && !coloursAll && refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if (colour.equals(n.getNoteColour())) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
           // all coords, all colours, specific refers
         } else if (coordsAll && coloursAll && !refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if (n.getMessage().contains(refers)) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
           // specific coords, specific colour, all refers
         } else if (!coordsAll && !coloursAll && refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && (colour.equals(n.getNoteColour()))) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
 
           }
@@ -265,16 +269,16 @@ public class Server {
         } else if (!coordsAll && coloursAll && !refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && n.getMessage().contains(refers)) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
           // all coords, specific colour, specific refer
         } else if (coordsAll && !coloursAll && !refersAll) {
           for (Note n : bBoard.notesOnBoard) {
             if ((colour.equals(n.getNoteColour())) && n.getMessage().contains(refers)) {
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+              outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
             }
           }
         }
@@ -370,7 +374,7 @@ public class Server {
 
     public void shakeBoard() {
       serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "SHAKE request was successful, and unpinned notes were removed.";
+      serverReasonPhrase = "SHAKE request was successful, and unpinned notes were removed. ";
 
       int numNotes = bBoard.notesOnBoard.size();
       for (int i = 0; i < numNotes; i++) {
@@ -382,15 +386,15 @@ public class Server {
     }
 
     public void clearBoard() {
-      serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "CLEAR request was successful.";
+      serverStatusCode = "200 - OK";
+      serverReasonPhrase = "CLEAR request was successful. ";
       System.out.println("Removing all notes.");
 
       if (bBoard.notesOnBoard.size() == 0) {
-        outputMsg += "There are already no notes on the board.";
+        outputMsg += "Board is already empty. ";
       } else {
         bBoard.notesOnBoard.clear();
-        outputMsg += "All notes were removed from the board.";
+        outputMsg += "All notes were removed from the board. ";
       }
 
     }

@@ -302,6 +302,8 @@ public class ClientGUI {
         if (isConnected) {
           connectBtn.setEnabled(false);
           disconnectBtn.setEnabled(true);
+          portField.setEnabled(false);
+          portField.setEnabled(false);
           connectBtn.setText("Connected");
         }
       }
@@ -373,7 +375,7 @@ public class ClientGUI {
       int portNumber = Integer.parseInt(portString);
       socket = new Socket();
       // 3 second timeout when trying to connect to wrong/invalid IP
-      socket.connect(new InetSocketAddress(IPAddress, portNumber), 3000);
+      socket.connect(new InetSocketAddress(IPAddress, portNumber), 2000);
       connected = true;
       // only read from server if socket successfully connects
       if (connected) {
@@ -394,19 +396,19 @@ public class ClientGUI {
           clientOutputBox.append(
               "\n [SERVER]: IMPORTANT: Note colours are case sensitive. You must stay within the bounds of the board.\n");
         } catch (Exception e) {
-          displayErrorMsg("Server response reading error.");
+          displayErrorMsg("500 - Internal Server Error: Server response could not be read.");
           return false;
         }
       }
     } catch (NumberFormatException nfe) {
-      displayErrorMsg("Please enter a valid port number, only integers are accepted.");
+      displayErrorMsg("400 - Bad Request: Please enter a valid port number, only integers are accepted.");
       return false;
     } catch (SocketTimeoutException ste) {
-      displayErrorMsg("Could not connect to the port or IP address in reasonable time.");
+      displayErrorMsg("401 - Connection Failure: Could not connect to the port or IP address in reasonable time.");
       connected = false;
       return false;
     } catch (Exception e) {
-      displayErrorMsg("Invalid IP address/port number, or the server is not running.");
+      displayErrorMsg("401 - Connection Failure: Invalid IP address/port number, or the server is not running.");
       return false;
     }
     return true;
@@ -458,7 +460,7 @@ public class ClientGUI {
         if (xField.getText().equals("") || yField.getText().equals("") || widthField.getText().equals("")
             || heightField.getText().equals("") || msgField.getText().equals("")) {
           valid = false;
-          displayErrorMsg("One or more fields do not have a specified value, or message is empty.");
+          displayErrorMsg("400 - Bad Request: One or more fields do not have a specified value, or message is empty.");
         }
         // check for valid number values
         if (valid) {
@@ -469,7 +471,7 @@ public class ClientGUI {
             int height = Integer.parseInt(heightField.getText());
 
             if (x < 0 || y < 0) {
-              displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
+              displayErrorMsg("400 - Bad Request: Please enter a number greater than or equal to 0 for both x, and y.");
             } else {
               output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP
                   + colourCombo.getSelectedItem() + SP + msgField.getText());
@@ -477,7 +479,8 @@ public class ClientGUI {
             }
 
           } catch (NumberFormatException nfe) {
-            displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+            displayErrorMsg(
+                "400 - Bad Request: Please enter a valid number, only integers are accepted for: x, y, width, height.");
           }
         }
 
@@ -511,13 +514,13 @@ public class ClientGUI {
           int y = Integer.parseInt(yGetField.getText());
 
           if (x < 0 || y < 0) {
-            displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
+            displayErrorMsg("400 - Bad Request: Please enter a number greater than or equal to 0 for both x, and y.");
           } else {
             output.println(requestType + SP + x + SP + y);
             success = true;
           }
         } catch (NumberFormatException nfe) {
-          displayErrorMsg("Please enter a valid integer number for both x, and y.");
+          displayErrorMsg("400 - Bad Request: Please enter a valid integer number for both x, and y.");
         }
       } else if (requestType.equals("SHAKE")) {
         output.println(requestType);
@@ -532,7 +535,7 @@ public class ClientGUI {
         readServerResponse();
       }
     } else {
-      displayErrorMsg("Cannot send requests until the client has connected to a server.");
+      displayErrorMsg("402 - Not Connected Error: Cannot send requests until the client has connected to a server.");
     }
   }
 
@@ -544,10 +547,10 @@ public class ClientGUI {
       input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       // read initial server response and display to client window
       String response = input.readLine();
-      clientOutputBox.append(" [SERVER]:" + response + "\r\n");
+      clientOutputBox.append(" " + response + "\r\n");
 
     } catch (Exception e) {
-      displayErrorMsg("Server response reading error.");
+      displayErrorMsg("500 - Internal Server Error: Server response could not be read.");
     }
 
   }
