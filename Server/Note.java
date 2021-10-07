@@ -29,15 +29,15 @@ public class Note {
     }
   }
   
-  public void addTopinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
+  public void addTopinList(int xCoord, int yCoord) {
     if (this.pinnedCount >= 0 && !pinnList.containsValue(yCoord)) {
-      pinnList.put(xCoord, yCoord);
+      this.pinnList.put(xCoord, yCoord);
     }      
   }
 
-  public void removeFrompinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
+  public void removeFrompinList(int xCoord, int yCoord) {
     if (this.pinnedCount > 0) {
-      pinnList.remove(xCoord, yCoord);
+      this.pinnList.remove(xCoord, yCoord);
     } else {
       System.out
             .println("Error: Cannot remove note that does not exist.");
