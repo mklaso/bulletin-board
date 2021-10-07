@@ -97,6 +97,8 @@ public class Server {
         output = new PrintWriter(socket.getOutputStream(), true);
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+        output.print("[SERVER]: Board width and height are: (" + bBoard.width + "," + bBoard.height + "). ");
+        output.println("Accepted colours are:");
         for (int idx = 0; idx < availNoteColours.size(); idx++) {
           output.println(availNoteColours.get(idx)); // send client what note colours are available
         }

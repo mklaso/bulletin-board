@@ -381,14 +381,18 @@ public class ClientGUI {
           // socket is connected, get the accepted note colours from server
           input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
           clientOutputBox.append(" [CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
-          clientOutputBox.append(" [SERVER]: The available note colours for use are: ");
           // read initial server response and display to client window
           String response;
           while (input.ready() && (response = input.readLine()) != null) {
-            clientOutputBox.append(response + " ");
-            colourCombo.addItem(response);
+            clientOutputBox.append(" " + response);
+            // only add colours to the combo box on GUI, not other text from the server
+            // output
+            if (!(response.contains("Board"))) {
+              colourCombo.addItem(response);
+            }
           }
-          clientOutputBox.append("\n [SERVER]: IMPORTANT - Note colours are case sensitive. \n");
+          clientOutputBox.append(
+              "\n [SERVER]: IMPORTANT: Note colours are case sensitive. You must stay within the bounds of the board.\n");
         } catch (Exception e) {
           displayErrorMsg("Server response reading error.");
           return false;
@@ -399,6 +403,7 @@ public class ClientGUI {
       return false;
     } catch (SocketTimeoutException ste) {
       displayErrorMsg("Could not connect to the port or IP address in reasonable time.");
+      connected = false;
       return false;
     } catch (Exception e) {
       displayErrorMsg("Invalid IP address/port number, or the server is not running.");
