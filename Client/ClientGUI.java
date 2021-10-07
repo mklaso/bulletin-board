@@ -12,6 +12,7 @@ public class ClientGUI {
   PrintWriter output;
   BufferedReader input;
   String SP = "_"; // used for sending requests to server
+  Boolean connected = false; // starts unconnected
 
   public ClientGUI() {
     this.window = new JFrame();
@@ -370,7 +371,6 @@ public class ClientGUI {
     try {
       // try to connect to server
       int portNumber = Integer.parseInt(portString);
-      Boolean connected = false;
       socket = new Socket();
       // 3 second timeout when trying to connect to wrong/invalid IP
       socket.connect(new InetSocketAddress(IPAddress, portNumber), 3000);
@@ -438,93 +438,97 @@ public class ClientGUI {
    */
   public void sendRequest(String requestType) {
     Boolean success = false;
-    try {
-      // for writing request to server
-      output = new PrintWriter(socket.getOutputStream(), true);
-    } catch (IOException io) {
-      System.out.println("Could not open socket stream.");
-    }
-
-    if (requestType.equals("POST")) {
-      Boolean valid = true;
-      // check for missing info from user
-      if (xField.getText().equals("") || yField.getText().equals("") || widthField.getText().equals("")
-          || heightField.getText().equals("") || msgField.getText().equals("")) {
-        valid = false;
-        displayErrorMsg("One or more fields do not have a specified value, or message is empty.");
+    // only allow requests to be sent if the client has connected to the server
+    if (connected) {
+      try {
+        // for writing request to server
+        output = new PrintWriter(socket.getOutputStream(), true);
+      } catch (IOException io) {
+        System.out.println("Could not open socket stream.");
       }
-      // check for valid number values
-      if (valid) {
+
+      if (requestType.equals("POST")) {
+        Boolean valid = true;
+        // check for missing info from user
+        if (xField.getText().equals("") || yField.getText().equals("") || widthField.getText().equals("")
+            || heightField.getText().equals("") || msgField.getText().equals("")) {
+          valid = false;
+          displayErrorMsg("One or more fields do not have a specified value, or message is empty.");
+        }
+        // check for valid number values
+        if (valid) {
+          try {
+            int x = Integer.parseInt(xField.getText());
+            int y = Integer.parseInt(yField.getText());
+            int width = Integer.parseInt(widthField.getText());
+            int height = Integer.parseInt(heightField.getText());
+
+            if (x < 0 || y < 0) {
+              displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
+            } else {
+              output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP
+                  + colourCombo.getSelectedItem() + SP + msgField.getText());
+              success = true;
+            }
+
+          } catch (NumberFormatException nfe) {
+            displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+          }
+        }
+
+      } else if (requestType.equals("GET")) {
+        // gets all pins coordinates on board
+        String refers = refersField.getText();
+        String contains = containsField.getText();
+        String colour = colourField.getText();
+
+        // empty value indicates all for that input
+        if (refers.equals("")) {
+          refers = "ALL";
+        }
+        if (contains.equals("")) {
+          contains = "ALL";
+        }
+        if (colour.equals("")) {
+          colour = "ALL";
+        }
+
+        if (allPinsCheck.isSelected()) {
+          output.println(requestType + SP + "PINS"); // request type 1
+          success = true;
+        } else {
+          output.println(requestType + SP + contains + SP + refers + SP + colour); // request type 2
+          success = true;
+        }
+      } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
         try {
-          int x = Integer.parseInt(xField.getText());
-          int y = Integer.parseInt(yField.getText());
-          int width = Integer.parseInt(widthField.getText());
-          int height = Integer.parseInt(heightField.getText());
+          int x = Integer.parseInt(xGetField.getText());
+          int y = Integer.parseInt(yGetField.getText());
 
           if (x < 0 || y < 0) {
             displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
           } else {
-            output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
-                + SP + msgField.getText());
+            output.println(requestType + SP + x + SP + y);
             success = true;
           }
-
         } catch (NumberFormatException nfe) {
-          displayErrorMsg("Please enter a valid number, only integers are accepted for: x, y, width, height.");
+          displayErrorMsg("Please enter a valid integer number for both x, and y.");
         }
-      }
-
-    } else if (requestType.equals("GET")) {
-      // gets all pins coordinates on board
-      String refers = refersField.getText();
-      String contains = containsField.getText();
-      String colour = colourField.getText();
-
-      // empty value indicates all for that input
-      if (refers.equals("")) {
-        refers = "ALL";
-      }
-      if (contains.equals("")) {
-        contains = "ALL";
-      }
-      if (colour.equals("")) {
-        colour = "ALL";
-      }
-
-      if (allPinsCheck.isSelected()) {
-        output.println(requestType + SP + "PINS"); // request type 1
+      } else if (requestType.equals("SHAKE")) {
+        output.println(requestType);
         success = true;
-      } else {
-        output.println(requestType + SP + contains + SP + refers + SP + colour); // request type 2
+      } else if (requestType.equals("CLEAR")) {
+        output.println(requestType);
         success = true;
       }
-    } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
-      try {
-        int x = Integer.parseInt(xGetField.getText());
-        int y = Integer.parseInt(yGetField.getText());
 
-        if (x < 0 || y < 0) {
-          displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
-        } else {
-          output.println(requestType + SP + x + SP + y);
-          success = true;
-        }
-      } catch (NumberFormatException nfe) {
-        displayErrorMsg("Please enter a valid integer number for both x, and y.");
+      // don't try to read from server unless a client request was successful.
+      if (success) {
+        readServerResponse();
       }
-    } else if (requestType.equals("SHAKE")) {
-      output.println(requestType);
-      success = true;
-    } else if (requestType.equals("CLEAR")) {
-      output.println(requestType);
-      success = true;
+    } else {
+      displayErrorMsg("Cannot send requests until the client has connected to a server.");
     }
-
-    // don't try to read from server unless a client request was successful.
-    if (success) {
-      readServerResponse();
-    }
-
   }
 
   public void readServerResponse() {
