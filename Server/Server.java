@@ -82,6 +82,8 @@ public class Server {
     private PrintWriter output;
     private final Object lock = new Object(); // basically mutex lock setup for synchronization
     private int clientID;
+    private ArrayList<Pin> pinList = new ArrayList<Pin>(); // keep track of pins to make sure no
+                                                           // duplicates
 
     ClientRequest(Socket socket) {
       this.socket = socket;
@@ -108,13 +110,6 @@ public class Server {
             // read input (request message) from client, parse it, then service it
             String[] requestData = response.split("_");
             methodType = requestData[0];
-
-            // System.out.println("Client request looks like: " + response);
-
-            // for testing, remove later
-            for (int i = 0; i < requestData.length; i++) {
-              System.out.println("arg " + i + ": " + requestData[i]);
-            }
 
             if (methodType.equals("POST")) {
               createNote(Integer.parseInt(requestData[1]), Integer.parseInt(requestData[2]),
@@ -170,8 +165,6 @@ public class Server {
         outputMsg += "A note with lower left x,y coordinates of (" + note.getXCoord() + "," + note.getYCoord()
             + "), width: " + note.getWidth() + ", height: " + note.getHeight() + ", colour: " + note.getNoteColour()
             + ", message: \"" + note.getMessage() + "\" was successfully created.";
-
-        // System.out.println(outputMsg);
       }
     }
 
@@ -189,7 +182,6 @@ public class Server {
         }
       } else {
         // type 2 request - filling in the boxes
-
         boolean coloursAll = false;
         boolean refersAll = false;
         boolean coordsAll = false;
@@ -218,12 +210,6 @@ public class Server {
           // empty search string target
           refersAll = true;
         }
-
-        System.out.println("Refers string is: " + refers);
-        System.out.println("Refers contains refers: " + refers.contains(refers));
-        System.out.println("STATIC string refers contains refers: " + "Test".contains(refers));
-
-        System.out.print("TYPE 2 GET REQUEST -->");
 
         // ALL - every note on board
         if (coordsAll && coloursAll && refersAll) {
@@ -298,24 +284,46 @@ public class Server {
     }
 
     public void pinNote(int xCoord, int yCoord) {
-      serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "PIN request was successful and the note is pinned.";
+      Boolean exists = false;
 
-      for (Note n : bBoard.notesOnBoard) {
-        if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
-            && yCoord <= n.getYCoord() + n.getHeight()) {
-          // pin the note requested by the client, increase the number of pins by 1
-          // current note
-
-          n.increasePinCount();
-          n.setPinStatus("PIN");
-          outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + ") is pinned.";
-          System.out.println("Note was pinned. Pin count is: " + n.getPinnedCount());
-        } else {
-          System.out.println("The note's coordinate is out of range, cannot be pinned."); // fix this to be a different
-                                                                                          // response msg
+      for (int i = 0; i < pinList.size(); i++) {
+        if (xCoord == pinList.get(i).x && yCoord == pinList.get(i).y) {
+          serverStatusCode = " ";
+          serverReasonPhrase = "";
+          outputMsg += "Cannot pin note, pin already exists in the current (x,y) position on the board.";
+          exists = true;
+          break;
         }
       }
+      if (exists == false) {
+        Boolean initial = true;
+        for (Note n : bBoard.notesOnBoard) {
+          if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
+              && yCoord <= n.getYCoord() + n.getHeight()) {
+            // pin the note requested by the client, increase the number of pins by 1
+            // current note
+
+            serverStatusCode = " 200 - OK";
+            serverReasonPhrase = "PIN request was successful and the note is pinned.";
+            n.increasePinCount();
+            n.setPinStatus("PIN");
+            // add new pin to list only once, but continue updating pin count for all notes
+            // in the area
+            if (initial) {
+              pinList.add(new Pin(xCoord, yCoord));
+            }
+            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                + ") is pinned.";
+            System.out.println("Note was pinned. Pin count is: " + n.getPinnedCount());
+
+          } else {
+            System.out.println("The note's coordinate is out of range, cannot be pinned."); // fix this to be a
+                                                                                            // different
+                                                                                            // response msg
+          }
+        }
+      }
+
     }
 
     public void unpinNote(int xCoord, int yCoord) {
@@ -327,13 +335,26 @@ public class Server {
             && yCoord <= n.getYCoord() + n.getHeight() && n.getPinnedCount() > 1) {
           // unpin the note requested by the client, lower pins if more than 1 pin on
           // current note
+          for (int i = 0; i < pinList.size(); i++) {
+            if (xCoord == pinList.get(i).x && yCoord == pinList.get(i).y) {
+              pinList.remove(i);
+              break;
+            }
+          }
+
           n.lowerPinCount();
-          outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord()
-              + " is unpinned.";
+          outputMsg += "The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord() + ","
+              + n.getYCoord() + "), width: " + n.getWidth() + ", height: " + n.getHeight() + " was unpinned.";
           System.out.println("Note was unpinned. Pin count is: " + n.getPinnedCount());
         } else if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
             && yCoord <= n.getYCoord() + n.getHeight() && n.getPinnedCount() == 1) {
           // unpin the only pinned note
+          for (int i = 0; i < pinList.size(); i++) {
+            if (xCoord == pinList.get(i).x && yCoord == pinList.get(i).y) {
+              pinList.remove(i);
+              break;
+            }
+          }
           n.lowerPinCount();
           n.setPinStatus("UNPIN");
           outputMsg += "The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord() + ","
@@ -351,8 +372,6 @@ public class Server {
 
       int numNotes = bBoard.notesOnBoard.size();
       for (int i = 0; i < numNotes; i++) {
-        // System.out.println("Note is pinned? ---> " +
-        // bBoard.notesOnBoard.get(i).getPinStatus());
         if (bBoard.notesOnBoard.get(i).getPinStatus() == false) {
           bBoard.notesOnBoard.remove(i);
         }

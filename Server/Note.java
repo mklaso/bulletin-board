@@ -1,14 +1,9 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class Note {
 
   private String message, noteColour;
   private int xCoord, yCoord, width, height, pinnedCount;
   private Boolean isPinned;
-
-  public HashSet<ArrayList<Integer>> pinList = new HashSet<>();
 
   public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message) {
     this.message = message;
@@ -19,7 +14,6 @@ public class Note {
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
     this.pinnedCount = 0; // starts with 0 pinned note
-    this.pinList = new HashSet<>();
   }
 
   /**
