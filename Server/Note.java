@@ -4,8 +4,7 @@ public class Note {
   private int xCoord, yCoord, width, height, pinnedCount;
   private Boolean isPinned;
 
-  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message, Map<Integer,ArraryList> pinnList = 
-    new HashMap<Integer,ArraryList> pinList) {
+  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message, HashMap<Integer,Integer> pinnList) {
     this.message = message;
     this.noteColour = noteColour;
     this.xCoord = xCoord;
@@ -14,7 +13,7 @@ public class Note {
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
     this.pinnedCount = 0; // starts with 0 pinned note
-    this.pinList = new HashMap<Integer,ArraryList>();
+    this.pinList = new HashMap<Integer,Integer>();
   }
 
   /**
@@ -27,6 +26,25 @@ public class Note {
       this.isPinned = true;
     } else {
       this.isPinned = false;
+    }
+  }
+  
+  public void addTopinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
+    if (this.pinnedCount >= 0 && !pinnList.containsValue(yCoord)) {
+      pinnList.put(xCoord, yCoord);
+      setPinStatus(String status);
+      increasePinCount();
+    }      
+  }
+
+  public void removeFrompinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
+    if (this.pinnedCount > 0) {
+      pinnList.remove(xCoord, yCoord);
+      setPinStatus(String status);
+      lowerPinCount();
+    } else {
+      System.out
+            .println("Error: Cannot remove note that does not exist.");
     }
   }
 
