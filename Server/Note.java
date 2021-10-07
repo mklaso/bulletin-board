@@ -32,16 +32,12 @@ public class Note {
   public void addTopinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
     if (this.pinnedCount >= 0 && !pinnList.containsValue(yCoord)) {
       pinnList.put(xCoord, yCoord);
-      setPinStatus(String status);
-      increasePinCount();
     }      
   }
 
   public void removeFrompinList(HashMap<Integer,Integer> pinnList, int xCoord, int yCoord, String status) {
     if (this.pinnedCount > 0) {
       pinnList.remove(xCoord, yCoord);
-      setPinStatus(String status);
-      lowerPinCount();
     } else {
       System.out
             .println("Error: Cannot remove note that does not exist.");
