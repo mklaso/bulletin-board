@@ -437,6 +437,7 @@ public class ClientGUI {
    *                    SHAKE, CLEAR}
    */
   public void sendRequest(String requestType) {
+    Boolean success = false;
     try {
       // for writing request to server
       output = new PrintWriter(socket.getOutputStream(), true);
@@ -465,6 +466,7 @@ public class ClientGUI {
           } else {
             output.println(requestType + SP + x + SP + y + SP + width + SP + height + SP + colourCombo.getSelectedItem()
                 + SP + msgField.getText());
+            success = true;
           }
 
         } catch (NumberFormatException nfe) {
@@ -491,8 +493,10 @@ public class ClientGUI {
 
       if (allPinsCheck.isSelected()) {
         output.println(requestType + SP + "PINS"); // request type 1
+        success = true;
       } else {
-        output.println(requestType + SP + refers + SP + contains + SP + colour); // request type 2
+        output.println(requestType + SP + contains + SP + refers + SP + colour); // request type 2
+        success = true;
       }
     } else if (requestType.equals("PIN") || requestType.equals("UNPIN")) {
       try {
@@ -503,18 +507,23 @@ public class ClientGUI {
           displayErrorMsg("Please enter a number greater than or equal to 0 for both x, and y.");
         } else {
           output.println(requestType + SP + x + SP + y);
+          success = true;
         }
       } catch (NumberFormatException nfe) {
         displayErrorMsg("Please enter a valid integer number for both x, and y.");
       }
     } else if (requestType.equals("SHAKE")) {
       output.println(requestType);
+      success = true;
     } else if (requestType.equals("CLEAR")) {
       output.println(requestType);
+      success = true;
     }
 
-    // call on readServerResponse method here?
-    readServerResponse();
+    // don't try to read from server unless a client request was successful.
+    if (success) {
+      readServerResponse();
+    }
 
   }
 
@@ -526,7 +535,7 @@ public class ClientGUI {
       input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       // read initial server response and display to client window
       String response = input.readLine();
-      clientOutputBox.append(" [SERVER]:" + response + "\n");
+      clientOutputBox.append(" [SERVER]:" + response + "\r\n");
 
     } catch (Exception e) {
       displayErrorMsg("Server response reading error.");

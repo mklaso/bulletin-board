@@ -1,10 +1,16 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 public class Note {
 
   private String message, noteColour;
   private int xCoord, yCoord, width, height, pinnedCount;
   private Boolean isPinned;
 
-  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message, HashMap<Integer,Integer> pinnList) {
+  public HashSet<ArrayList<Integer>> pinList = new HashSet<>();
+
+  public Note(int xCoord, int yCoord, int width, int height, String noteColour, String message) {
     this.message = message;
     this.noteColour = noteColour;
     this.xCoord = xCoord;
@@ -13,7 +19,7 @@ public class Note {
     this.height = height;
     this.isPinned = false; // note defaults to unpinned
     this.pinnedCount = 0; // starts with 0 pinned note
-    this.pinList = new HashMap<Integer,Integer>();
+    this.pinList = new HashSet<>();
   }
 
   /**
@@ -26,21 +32,6 @@ public class Note {
       this.isPinned = true;
     } else {
       this.isPinned = false;
-    }
-  }
-  
-  public void addTopinList(int xCoord, int yCoord) {
-    if (this.pinnedCount >= 0 && !pinnList.containsValue(yCoord)) {
-      this.pinnList.put(xCoord, yCoord);
-    }      
-  }
-
-  public void removeFrompinList(int xCoord, int yCoord) {
-    if (this.pinnedCount > 0) {
-      this.pinnList.remove(xCoord, yCoord);
-    } else {
-      System.out
-            .println("Error: Cannot remove note that does not exist.");
     }
   }
 

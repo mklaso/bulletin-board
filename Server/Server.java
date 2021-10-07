@@ -102,10 +102,9 @@ public class Server {
         // keep checking for client requests while client is connected to server
         String response;
         while ((response = input.readLine()) != null) {
-          output = new PrintWriter(socket.getOutputStream(), true);
           synchronized (lock) {
             // critical section
-
+            output = new PrintWriter(socket.getOutputStream(), true);
             // read input (request message) from client, parse it, then service it
             String[] requestData = response.split("_");
             methodType = requestData[0];
@@ -135,13 +134,13 @@ public class Server {
             } else if (methodType.equals("CLEAR")) {
               clearBoard();
             }
+            // now send the serverResponseMsg back to the client socket
+            serverResponseMsg = serverStatusCode + ": " + serverReasonPhrase + outputMsg;
+            output.println(serverResponseMsg);
+
+            outputMsg = "";
 
           }
-          // now send the serverResponseMsg back to the client socket
-          serverResponseMsg = serverStatusCode + ": " + serverReasonPhrase + outputMsg;
-          output.println(serverResponseMsg + "\n");
-
-          outputMsg = "";
         }
         disconnectClient();
       } catch (IOException io) {
@@ -172,144 +171,149 @@ public class Server {
             + "), width: " + note.getWidth() + ", height: " + note.getHeight() + ", colour: " + note.getNoteColour()
             + ", message: \"" + note.getMessage() + "\" was successfully created.";
 
-        System.out.println(outputMsg);
+        // System.out.println(outputMsg);
       }
     }
 
     public void getNotes(String contains, String refers, String colour, int type) {
       serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "GET request was successfully interprested and the note is successfully found. ";
+      serverReasonPhrase = "GET request was successful and the note(s) have been found.";
       // type 1 request - all pins
       if (type == 1) {
         for (Note n : bBoard.notesOnBoard) {
           if (n.getPinStatus() == true) {
-            outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
+            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + "), colour: "
+                + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
             System.out.println(outputMsg);
           }
         }
-      }
+      } else {
+        // type 2 request - filling in the boxes
 
-      boolean colour_exists = true;
-      boolean refers_exists = true;
-      boolean coord_exists = true;
-      String[] coords = contains.split(" ");
-      int XCoord, YCoord;
+        boolean coloursAll = false;
+        boolean refersAll = false;
+        boolean coordsAll = false;
+        int XCoord = 0;
+        int YCoord = 0;
 
-      // type 2 request - filling in the boxes
-      try {
-        XCoord = Integer.parseInt(coords[0]);
-        YCoord = Integer.parseInt(coords[1]);
-
-        if (contains.equals("ALL"))
+        if (contains.equals("ALL")) {
           // empty coordinates
-          coord_exists = false;
-        if (colour.equals("ALL"))
+          coordsAll = true;
+        } else {
+          try {
+            String[] coords = contains.split(" ");
+            XCoord = Integer.parseInt(coords[0]);
+            YCoord = Integer.parseInt(coords[1]);
+            System.out.println(XCoord + ", " + YCoord);
+          } catch (NumberFormatException nfe) {
+            System.out.println("Invalid contains (coordinates) data given.");
+          }
+        }
+        if (colour.equals("ALL")) {
           // empty colour
-          colour_exists = false;
-        if (refers.equals("ALL"))
+          coloursAll = true;
+        }
+
+        if (refers.equals("ALL")) {
           // empty search string target
-          refers_exists = false;
+          refersAll = true;
+        }
 
-        // matching coordinate
-        if (coord_exists && !refers_exists && !colour_exists) {
+        System.out.println("Refers string is: " + refers);
+        System.out.println("Refers contains refers: " + refers.contains(refers));
+        System.out.println("STATIC string refers contains refers: " + "Test".contains(refers));
+
+        System.out.print("TYPE 2 GET REQUEST -->");
+
+        // ALL - every note on board
+        if (coordsAll && coloursAll && refersAll) {
           for (Note n : bBoard.notesOnBoard) {
-            if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord) {
-              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
-              System.out.println(outputMsg);
+            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + "), colour: "
+                + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+          }
+          // specific coords, specific colour, specific refers
+        } else if (!coordsAll && !coloursAll && !refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && (colour.equals(n.getNoteColour()))
+                && n.getMessage().contains(refers)) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+          }
+          // specific coords, all colours, all refers
+        } else if (!coordsAll && coloursAll && refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (XCoord == n.getXCoord() && YCoord == n.getYCoord()) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+          }
+          // all coords, specific colour, all refers
+        } else if (coordsAll && !coloursAll && refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (colour.equals(n.getNoteColour())) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+          }
+          // all coords, all colours, specific refers
+        } else if (coordsAll && coloursAll && !refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if (n.getMessage().contains(refers)) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+          }
+          // specific coords, specific colour, all refers
+        } else if (!coordsAll && !coloursAll && refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && (colour.equals(n.getNoteColour()))) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+
+          }
+          // specific coords, all colours, specific refers
+        } else if (!coordsAll && coloursAll && !refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if ((XCoord == n.getXCoord() && YCoord == n.getYCoord()) && n.getMessage().contains(refers)) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
+            }
+          }
+          // all coords, specific colour, specific refer
+        } else if (coordsAll && !coloursAll && !refersAll) {
+          for (Note n : bBoard.notesOnBoard) {
+            if ((colour.equals(n.getNoteColour())) && n.getMessage().contains(refers)) {
+              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                  + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\"";
             }
           }
         }
 
-        // matching colour
-        else if (!coord_exists && !refers_exists && colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getNoteColour().equals(colour)) {
-              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
-              System.out.println(outputMsg);
-            }
-          }
-        }
+        System.out.println(outputMsg);
 
-        // error on these, something wrong with if statement in for loop
-
-        // matching search string
-        // else if (!coord_exists && refers_exists && !colour_exists) {
-        // for (Note n : bBoard.notesOnBoard) {
-        // if (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
-        // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
-        // has a message: " + n.getMessage();
-        // System.out.println(outputMsg);
-        // }
-        // }
-        // }
-
-        // error on these, something wrong with if statement in for loop
-
-        // matching coordinate and search string
-        // else if (coord_exists && refers_exists && !colour_exists) {
-        // for (Note n : bBoard.notesOnBoard) {
-        // if (n.getXCoord() <= xCoord && n.getYCoord() <= yCoord &&
-        // (n.getMessage().indexOf(refers) != -1 ? true : false) == true) {
-        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
-        // y-coordinate: " + n.getYCoord() + " is " + n.getNoteColour() + " colour" +"
-        // has a message: " + n.getMessage();
-        // System.out.println(outputMsg);
-        // }
-        // }
-        // }
-
-        // matching coordinate and colour on the board
-        else if (coord_exists && !refers_exists && colour_exists) {
-          for (Note n : bBoard.notesOnBoard) {
-            if (n.getXCoord() <= XCoord && n.getYCoord() <= YCoord && n.getNoteColour().equals(colour)) {
-              outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is "
-                  + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
-              System.out.println(outputMsg);
-            }
-          }
-        }
-
-        // error on these, something wrong with if statement in for loop
-
-        // matching search string and colour
-        // else if (!coord_exists && refers_exists && colour_exists) {
-        // for (Note n : bBoard.notesOnBoard) {
-        // if (&& n.getNoteColour().equals(colour) && (n.getMessage().indexOf(refers) !=
-        // -1 ? true : false) == true) {
-        // outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and
-        // y-coordinate: " + n.getYCoord() + " is "
-        // + n.getNoteColour() + " colour" + " has a message: " + n.getMessage();
-        // System.out.println(outputMsg);
-        // }
-        // }
-        // }
-      } catch (NumberFormatException nfe) {
-        System.out.println("Invalid pin data given.");
       }
 
     }
 
     public void pinNote(int xCoord, int yCoord) {
       serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "PIN request was successfully interprested and the note is successfully pinned.";
-      System.out.println("Pinned note.");
+      serverReasonPhrase = "PIN request was successful and the note is pinned.";
+
       for (Note n : bBoard.notesOnBoard) {
         if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
             && yCoord <= n.getYCoord() + n.getHeight()) {
           // pin the note requested by the client, increase the number of pins by 1
           // current note
-          n.addTopinList(xCoord, yCoord)
+
           n.increasePinCount();
           n.setPinStatus("PIN");
-          System.out
-              .println("Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + ") is pinned.");
-          System.out.println("This note has been pinned " + n.getPinnedCount() + " time(s).");
+          outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord() + ") is pinned.";
+          System.out.println("Note was pinned. Pin count is: " + n.getPinnedCount());
         } else {
-          System.out.println("The note's coordinate is out of range, cannot be pinned.");
+          System.out.println("The note's coordinate is out of range, cannot be pinned."); // fix this to be a different
+                                                                                          // response msg
         }
       }
     }
@@ -324,47 +328,50 @@ public class Server {
           // unpin the note requested by the client, lower pins if more than 1 pin on
           // current note
           n.lowerPinCount();
-          n.removeFrompinList(xCoord, yCoord);
-          System.out.println(
-              "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord() + " is unpinned.");
-          System.out.println("The bulletin board still has " + n.getPinnedCount() + " pinned note(s). ");
+          outputMsg += "Note with x-coordinate: " + n.getXCoord() + " and y-coordinate: " + n.getYCoord()
+              + " is unpinned.";
+          System.out.println("Note was unpinned. Pin count is: " + n.getPinnedCount());
         } else if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
             && yCoord <= n.getYCoord() + n.getHeight() && n.getPinnedCount() == 1) {
           // unpin the only pinned note
           n.lowerPinCount();
           n.setPinStatus("UNPIN");
-          removeFrompinList(int xCoord, int yCoord);
-          System.out.println("The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord()
-              + "," + n.getYCoord() + "), width: " + n.getWidth() + ", height: " + n.getHeight() + " was unpinned.");
+          outputMsg += "The " + n.getNoteColour() + " note with lower left x,y coordinates (" + n.getXCoord() + ","
+              + n.getYCoord() + "), width: " + n.getWidth() + ", height: " + n.getHeight() + " was unpinned.";
+          System.out.println("Note's last pin was removed. Pin count is: " + n.getPinnedCount());
         } else {
-          System.out.println("The note is not pinned, unable to unpin it.");
+          System.out.println("The note is not pinned, unable to unpin it."); // fix this to be a different response msg
         }
       }
     }
 
     public void shakeBoard() {
       serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "SHAKE request was successfully interprested and all the notes were successfully removed.";
-      System.out.println("Removing all the notes.");
-      for (Note n : bBoard.notesOnBoard) {
-        if (!n.getPinStatus()) {
-          bBoard.notesOnBoard.remove(n);
-          System.out
-              .println(n.getNoteColour() + " unpinned note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
-                  + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
+      serverReasonPhrase = "SHAKE request was successful, and unpinned notes were removed.";
+
+      int numNotes = bBoard.notesOnBoard.size();
+      for (int i = 0; i < numNotes; i++) {
+        // System.out.println("Note is pinned? ---> " +
+        // bBoard.notesOnBoard.get(i).getPinStatus());
+        if (bBoard.notesOnBoard.get(i).getPinStatus() == false) {
+          bBoard.notesOnBoard.remove(i);
         }
+
       }
     }
 
     public void clearBoard() {
       serverStatusCode = " 200 - OK";
-      serverReasonPhrase = "CLEAR request was successfully interprested and all the unpinned notes were successfully removed.";
-      System.out.println("Removing unpinned notes.");
-      for (Note n : bBoard.notesOnBoard) {
-        bBoard.notesOnBoard.remove(n);
-        System.out.println(n.getNoteColour() + " note with X Coordinate: " + n.getXCoord() + ", Y Coordinate: "
-            + n.getYCoord() + ", width: " + n.getWidth() + ", height: " + n.getHeight() + " was removed.");
+      serverReasonPhrase = "CLEAR request was successful.";
+      System.out.println("Removing all notes.");
+
+      if (bBoard.notesOnBoard.size() == 0) {
+        outputMsg += "There are already no notes on the board.";
+      } else {
+        bBoard.notesOnBoard.clear();
+        outputMsg += "All notes were removed from the board.";
       }
+
     }
 
     public void disconnectClient() throws IOException {
