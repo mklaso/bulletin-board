@@ -34,11 +34,12 @@ public class ClientGUI {
   JTextField heightField = new JTextField();
   JTextField msgField = new JTextField();
   JTextField refersField = new JTextField();
-  JTextField containsField = new JTextField();
   JTextField colourField = new JTextField();
   JTextField xGetField = new JTextField();
   JTextField yGetField = new JTextField();
   JCheckBox allPinsCheck = new JCheckBox("ALL PINS");
+  JTextField xContainsField = new JTextField();
+  JTextField yContainsField = new JTextField();
 
   // adding all the components to GUI, setup controller logic
   public void setupGUI() {
@@ -59,6 +60,8 @@ public class ClientGUI {
     JLabel colourLabel = new JLabel("Colour");
     JLabel refersLabel = new JLabel("RefersTo=");
     JLabel containsLabel = new JLabel("Contains=");
+    JLabel xContains = new JLabel("X");
+    JLabel yContains = new JLabel("Y");
     JLabel colourLabel2 = new JLabel("Colour=");
 
     JButton getBtn = new JButton("GET");
@@ -87,109 +90,116 @@ public class ClientGUI {
     // making it look nice and organized
     GroupLayout layout = new GroupLayout(window.getContentPane());
     window.getContentPane().setLayout(layout);
-    layout
-        .setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+    layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING)
+                .addComponent(jSeparator2, GroupLayout.Alignment.TRAILING)
+                .addComponent(jSeparator3, GroupLayout.Alignment.TRAILING))
+            .addContainerGap())
+        .addGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup().addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator2, GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator3, GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup().addGroup(layout
-                .createParallelGroup(GroupLayout.Alignment.TRAILING).addGroup(layout.createSequentialGroup()
-                    .addContainerGap().addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(yLabelGet, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 18,
-                            GroupLayout.PREFERRED_SIZE)
-                        .addComponent(xLabelGet, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE))
-                    .addGap(4, 4, 4)
-                    .addGroup(
-                        layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(
-                                xGetField, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(yGetField, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18, 18, 18).addComponent(pinBtn).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(
-                        unpinBtn)
-                    .addGap(39, 39, 39).addComponent(shakeBtn).addGap(10, 10, 10).addComponent(clearBtn)
-                    .addGap(12, 12, 12))
-                .addGroup(layout
-                    .createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup()
-                        .addGap(150, 150, 150).addGroup(layout
-                            .createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
-                                .createParallelGroup(GroupLayout.Alignment.TRAILING, false).addGroup(
-                                    GroupLayout.Alignment.LEADING,
-                                    layout.createSequentialGroup()
-                                        .addComponent(msgField, GroupLayout.PREFERRED_SIZE, 356,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addGap(69, 69, 69).addComponent(postBtn, GroupLayout.PREFERRED_SIZE, 108,
-                                            GroupLayout.PREFERRED_SIZE))
-                                .addGroup(
-                                    layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                            .addComponent(yLabel)
-                                            .addGroup(layout.createSequentialGroup().addGap(95, 95, 95).addComponent(
-                                                yField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)))
-                                        .addGap(40, 40, 40)
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                            .addComponent(widthLabel, GroupLayout.Alignment.TRAILING,
-                                                GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(heightLabel))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                            .addComponent(heightField, GroupLayout.PREFERRED_SIZE, 81,
-                                                GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(widthField, GroupLayout.PREFERRED_SIZE, 81,
-                                                GroupLayout.PREFERRED_SIZE))
-                                        .addGap(190, 190, 190)))
-                            .addGroup(layout.createSequentialGroup().addComponent(xLabel).addGap(17, 17, 17)
-                                .addComponent(xField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-                                .addGap(214, 214, 214)
-                                .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18,
-                                    18)
-                                .addComponent(colourCombo, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup().addGroup(
-                                layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(refersLabel)
-                                    .addComponent(containsLabel))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(refersField, GroupLayout.PREFERRED_SIZE, 81,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addGap(37, 37, 37).addComponent(colourLabel2).addGap(18, 18, 18).addComponent(
-                                            colourField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(
-                                        layout.createSequentialGroup()
-                                            .addComponent(containsField, GroupLayout.PREFERRED_SIZE, 81,
-                                                GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(allPinsCheck)))
-                                .addGap(76, 76, 76)
-                                .addComponent(getBtn, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE))
-                            .addComponent(msgLabel)
+                    .addComponent(yLabelGet, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 18,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addComponent(xLabelGet, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(xGetField, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(yGetField, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18).addComponent(pinBtn).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(unpinBtn).addGap(39, 39, 39).addComponent(shakeBtn).addGap(10, 10, 10).addComponent(
+                    clearBtn)
+                .addGap(12, 12, 12))
+            .addGroup(layout
+                .createParallelGroup(
+                    GroupLayout.Alignment.LEADING)
+                .addGroup(
+                    layout
+                        .createSequentialGroup().addGap(150, 150,
+                            150)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+                            .createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(GroupLayout.Alignment.LEADING,
+                                layout.createSequentialGroup().addComponent(msgField, GroupLayout.PREFERRED_SIZE, 356,
+                                    GroupLayout.PREFERRED_SIZE).addGap(69, 69, 69)
+                                    .addComponent(postBtn, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(yLabel)
+                                    .addGroup(layout.createSequentialGroup().addGap(95, 95, 95).addComponent(yField,
+                                        GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)))
+                                .addGap(40, 40, 40)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(widthLabel, GroupLayout.Alignment.TRAILING,
+                                        GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(heightLabel))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(heightField, GroupLayout.PREFERRED_SIZE, 81,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(widthField, GroupLayout.PREFERRED_SIZE, 81,
+                                        GroupLayout.PREFERRED_SIZE))
+                                .addGap(190, 190, 190)))
+                            .addGroup(
+                                layout.createSequentialGroup().addComponent(xLabel).addGap(17, 17, 17)
+                                    .addComponent(xField, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                    .addGap(214, 214,
+                                        214)
+                                    .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 41,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18,
+                                        18)
+                                    .addComponent(colourCombo, GroupLayout.PREFERRED_SIZE, 81,
+                                        GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(refersLabel).addComponent(containsLabel))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addGroup(GroupLayout.Alignment.TRAILING,
+                                        layout.createSequentialGroup().addComponent(xContains).addGap(3, 3, 3)
+                                            .addComponent(xContainsField, GroupLayout.PREFERRED_SIZE, 28,
+                                                GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(yContains).addGap(3, 3, 3).addComponent(yContainsField,
+                                                GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(refersField, GroupLayout.PREFERRED_SIZE, 81,
+                                        GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup().addGap(37, 37, 37)
+                                        .addComponent(colourLabel2).addGap(18, 18, 18).addComponent(colourField,
+                                            GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(portNumLabel, GroupLayout.PREFERRED_SIZE, 92,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(
-                                            portNumField, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(IPAddrLabel, GroupLayout.PREFERRED_SIZE, 92,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(
-                                            IPAddrField, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(allPinsCheck)))
+                                .addGap(63, 63, 63)
+                                .addComponent(
+                                    getBtn, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10))
+                            .addComponent(msgLabel)
+                            .addGroup(layout.createSequentialGroup().addGroup(layout
+                                .createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(portNumLabel, GroupLayout.PREFERRED_SIZE, 92,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(portNumField,
+                                        GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(IPAddrLabel, GroupLayout.PREFERRED_SIZE, 92,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(IPAddrField,
+                                        GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)))
                                 .addGap(29, 29, 29)
                                 .addComponent(connectBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
                                     GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18).addComponent(disconnectBtn))))
-                    .addGroup(layout.createSequentialGroup().addGap(142, 142, 142).addComponent(jScrollPane1,
-                        GroupLayout.PREFERRED_SIZE, 551, GroupLayout.PREFERRED_SIZE))))
-                .addGap(0, 152, Short.MAX_VALUE)));
+                .addGroup(layout.createSequentialGroup().addGap(142, 142, 142).addComponent(jScrollPane1,
+                    GroupLayout.PREFERRED_SIZE, 551, GroupLayout.PREFERRED_SIZE))))
+            .addGap(0, 152, Short.MAX_VALUE)));
     layout.setVerticalGroup(
         layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(GroupLayout.Alignment.TRAILING,
-            layout.createSequentialGroup().addContainerGap(35, Short.MAX_VALUE)
+            layout.createSequentialGroup().addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
@@ -206,30 +216,34 @@ public class ClientGUI {
                 .addGap(16, 16, 16)
                 .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(xLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(xField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
-                            .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(colourCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(yLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(yField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(widthLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(widthField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(heightLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(heightField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE))))
+                .addGroup(
+                    layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(xLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(xField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                    GroupLayout.PREFERRED_SIZE)
+                                .addComponent(colourLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(colourCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                    GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
+                                layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(yLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(yField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(
+                            layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(widthLabel, GroupLayout.PREFERRED_SIZE, 22,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(widthField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(heightLabel, GroupLayout.PREFERRED_SIZE, 22,
+                                        GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(heightField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(msgLabel, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE).addGap(2, 2, 2)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -237,8 +251,9 @@ public class ClientGUI {
                     .addComponent(postBtn, GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
                 .addGap(20, 20, 20)
                 .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup().addGap(11, 11, 11)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(refersLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
                             .addComponent(colourLabel2, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
@@ -249,13 +264,14 @@ public class ClientGUI {
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(containsLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(containsField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                            .addComponent(xContainsField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.PREFERRED_SIZE)
-                            .addComponent(allPinsCheck)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                        .addComponent(getBtn, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)))
-                .addGap(16, 16, 16)
+                            .addComponent(allPinsCheck).addComponent(xContains)
+                            .addComponent(yContainsField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addComponent(yContains)))
+                    .addComponent(getBtn, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addComponent(
                     jSeparator3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(14, 14, 14)
@@ -302,8 +318,8 @@ public class ClientGUI {
         if (isConnected) {
           connectBtn.setEnabled(false);
           disconnectBtn.setEnabled(true);
-          portField.setEnabled(false);
-          portField.setEnabled(false);
+          portNumField.setEnabled(false);
+          IPAddrField.setEnabled(false);
           connectBtn.setText("Connected");
         }
       }
@@ -487,14 +503,14 @@ public class ClientGUI {
       } else if (requestType.equals("GET")) {
         // gets all pins coordinates on board
         String refers = refersField.getText();
-        String contains = containsField.getText();
+        String contains = xContainsField.getText() + " " + yContainsField.getText();
         String colour = colourField.getText();
 
         // empty value indicates all for that input
         if (refers.equals("")) {
           refers = "ALL";
         }
-        if (contains.equals("")) {
+        if (xContainsField.getText().equals("") && yContainsField.getText().equals("")) {
           contains = "ALL";
         }
         if (colour.equals("")) {
