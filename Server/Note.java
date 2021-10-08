@@ -41,31 +41,6 @@ public class Note {
     this.pinnedCount++;
   }
 
-  // note setters
-  public void setXCoord(int xCoord) {
-    this.xCoord = xCoord;
-  }
-
-  public void setYCoord(int yCoord) {
-    this.yCoord = yCoord;
-  }
-
-  public void setNoteColour(String noteColour) {
-    this.noteColour = noteColour;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public void setHeight(int height) {
-    this.height = height;
-  }
-
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
   // note getters
   public int getXCoord() {
     return this.xCoord;
@@ -98,5 +73,4 @@ public class Note {
   public int getPinnedCount() {
     return this.pinnedCount;
   }
-
 }

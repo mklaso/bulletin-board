@@ -185,7 +185,6 @@ public class Server {
           if (n.getPinStatus() == true) {
             outputMsg += "Found note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
                 + "), colour: " + n.getNoteColour() + ", with the message: \"" + n.getMessage() + "\". ";
-            System.out.println(outputMsg);
           }
         }
       } else {
@@ -210,8 +209,6 @@ public class Server {
               XCoord = Integer.parseInt(coords[0]);
               YCoord = Integer.parseInt(coords[1]);
             }
-
-            System.out.println(XCoord + ", " + YCoord);
           } catch (NumberFormatException nfe) {
             serverStatusCode = "400 - Bad Request";
             serverReasonPhrase = "GET request failed. ";
@@ -414,7 +411,8 @@ public class Server {
         outputMsg += "Board is already empty. ";
       } else {
         bBoard.notesOnBoard.clear();
-        outputMsg += "All notes were removed from the board. ";
+        pinList.clear();
+        outputMsg += "All notes, and pins were removed from the board. ";
       }
 
     }
