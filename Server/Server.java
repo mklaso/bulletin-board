@@ -304,50 +304,46 @@ public class Server {
       Boolean exists = false;
 
       // check if there are notes on the board first before pinning
-      if (pinList.size() > 0) {
-        for (int i = 0; i < pinList.size(); i++) {
-          if (xCoord == pinList.get(i).x && yCoord == pinList.get(i).y) {
-            serverStatusCode = "200 - OK";
-            serverReasonPhrase = "No notes pinned. ";
-            outputMsg += "Pin already exists in the current (x,y) position on the board. ";
-            exists = true;
-            break;
-          }
-        }
-        if (exists == false) {
-          Boolean initial = true;
-          for (Note n : bBoard.notesOnBoard) {
-            if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
-                && yCoord <= n.getYCoord() + n.getHeight()) {
-              // pin the note requested by the client, increase the number of pins by 1
-              // current note
+      serverStatusCode = " 200 - OK";
+      serverReasonPhrase = "PIN request was successful. ";
 
-              serverStatusCode = " 200 - OK";
-              serverReasonPhrase = "PIN request was successful and the note is pinned.";
-              n.increasePinCount();
-              n.setPinStatus("PIN");
-              // add new pin to list only once, but continue updating pin count for all notes
-              // in the area
-              if (initial) {
-                pinList.add(new Pin(xCoord, yCoord));
-              }
-              outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
-                  + ") is pinned.";
-              System.out.println("Note was pinned. Pin count is: " + n.getPinnedCount());
-
-            } else {
-              System.out.println("The note's coordinate is out of range, cannot be pinned."); // fix this to be a
-                                                                                              // different
-                                                                                              // response msg
-            }
-          }
+      for (int i = 0; i < pinList.size(); i++) {
+        if (xCoord == pinList.get(i).x && yCoord == pinList.get(i).y) {
+          serverStatusCode = "200 - OK";
+          serverReasonPhrase = "No notes pinned. ";
+          outputMsg += "Pin already exists in the current (x,y) position on the board. ";
+          exists = true;
+          break;
         }
-      } else {
-        serverStatusCode = "200 - OK";
-        serverReasonPhrase = "Unsuccessful pin. ";
-        outputMsg += "There are no notes to pin. ";
       }
+      if (exists == false) {
+        Boolean initial = true;
+        for (Note n : bBoard.notesOnBoard) {
+          if (xCoord >= n.getXCoord() && xCoord <= n.getXCoord() + n.getWidth() && yCoord >= n.getYCoord()
+              && yCoord <= n.getYCoord() + n.getHeight()) {
+            // pin the note requested by the client, increase the number of pins by 1
+            // current note
 
+            serverStatusCode = " 200 - OK";
+            serverReasonPhrase = "PIN request was successful and the note is pinned.";
+            n.increasePinCount();
+            n.setPinStatus("PIN");
+            // add new pin to list only once, but continue updating pin count for all notes
+            // in the area
+            if (initial) {
+              pinList.add(new Pin(xCoord, yCoord));
+            }
+            outputMsg += "Note with lower left x,y coordinates (" + n.getXCoord() + "," + n.getYCoord()
+                + ") is pinned.";
+            System.out.println("Note was pinned. Pin count is: " + n.getPinnedCount());
+
+          } else {
+            System.out.println("The note's coordinate is out of range, cannot be pinned."); // fix this to be a
+                                                                                            // different
+                                                                                            // response msg
+          }
+        }
+      }
     }
 
     public void unpinNote(int xCoord, int yCoord) {

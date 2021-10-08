@@ -392,9 +392,9 @@ public class ClientGUI {
       socket = new Socket();
       // 3 second timeout when trying to connect to wrong/invalid IP
       socket.connect(new InetSocketAddress(IPAddress, portNumber), 2000);
-      connected = true;
       // only read from server if socket successfully connects
-      if (connected) {
+      if (socket.isConnected()) {
+        connected = true;
         try {
           // socket is connected, get the accepted note colours from server
           input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -421,7 +421,6 @@ public class ClientGUI {
       return false;
     } catch (SocketTimeoutException ste) {
       displayErrorMsg("401 - Connection Failure: Could not connect to the port or IP address in reasonable time.");
-      connected = false;
       return false;
     } catch (Exception e) {
       displayErrorMsg("401 - Connection Failure: Invalid IP address/port number, or the server is not running.");
