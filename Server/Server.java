@@ -98,10 +98,12 @@ public class Server {
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         output.print("[SERVER]: Board width and height are: (" + bBoard.width + "," + bBoard.height + "). ");
+        output.flush();
         output.println("Accepted colours are:");
         for (int idx = 0; idx < availNoteColours.size(); idx++) {
           output.println(availNoteColours.get(idx)); // send client what note colours are available
         }
+        output.flush();
 
         // keep checking for client requests while client is connected to server
         String response;
@@ -127,6 +129,7 @@ public class Server {
             } else if (methodType.equals("UNPIN")) {
               unpinNote(Integer.parseInt(requestData[1]), Integer.parseInt(requestData[2]));
             } else if (methodType.equals("SHAKE")) {
+
               shakeBoard();
             } else if (methodType.equals("CLEAR")) {
               clearBoard();
@@ -134,6 +137,7 @@ public class Server {
             // now send the serverResponseMsg back to the client socket
             serverResponseMsg = serverStatusCode + ": " + serverReasonPhrase + outputMsg;
             output.println("[SERVER]: " + serverResponseMsg);
+            output.flush();
 
             // reset output msg for the next request
             outputMsg = "";
@@ -147,6 +151,7 @@ public class Server {
           System.out.println("Socket already closed.");
         }
       } catch (Exception e) {
+        System.out.println("Error: " + e);
         System.out.println("Unexpected error has occurred.");
       }
     }
@@ -198,12 +203,14 @@ public class Server {
         } else {
           try {
             String[] coords = contains.split(" ");
-            XCoord = Integer.parseInt(coords[0]);
-            YCoord = Integer.parseInt(coords[1]);
-            // there should only be two parameters x,y
+            // there should be two parameters x,y
             if (coords.length != 2) {
               valid = false;
+            } else {
+              XCoord = Integer.parseInt(coords[0]);
+              YCoord = Integer.parseInt(coords[1]);
             }
+
             System.out.println(XCoord + ", " + YCoord);
           } catch (NumberFormatException nfe) {
             serverStatusCode = "400 - Bad Request";
@@ -325,7 +332,7 @@ public class Server {
             // current note
 
             serverStatusCode = " 200 - OK";
-            serverReasonPhrase = "PIN request was successful and the note is pinned.";
+            serverReasonPhrase = "PIN request was successful and the note is pinned. ";
             n.increasePinCount();
             n.setPinStatus("PIN");
             // add new pin to list only once, but continue updating pin count for all notes
@@ -391,11 +398,10 @@ public class Server {
       serverReasonPhrase = "SHAKE request was successful, and unpinned notes were removed. ";
 
       int numNotes = bBoard.notesOnBoard.size();
-      for (int i = 0; i < numNotes; i++) {
+      for (int i = numNotes - 1; i >= 0; i--) {
         if (bBoard.notesOnBoard.get(i).getPinStatus() == false) {
           bBoard.notesOnBoard.remove(i);
         }
-
       }
     }
 

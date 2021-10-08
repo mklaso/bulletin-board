@@ -386,34 +386,40 @@ public class ClientGUI {
    * @return true if client connected to server, false on error
    */
   public Boolean connect(String IPAddress, String portString) {
+    socket = new Socket();
     try {
       // try to connect to server
       int portNumber = Integer.parseInt(portString);
-      socket = new Socket();
       // 3 second timeout when trying to connect to wrong/invalid IP
       socket.connect(new InetSocketAddress(IPAddress, portNumber), 2000);
       // only read from server if socket successfully connects
       if (socket.isConnected()) {
         connected = true;
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         try {
           // socket is connected, get the accepted note colours from server
-          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
           clientOutputBox.append(" [CLIENT]: Successfully connected to server at port: " + portNumber + ".\n");
+
           // read initial server response and display to client window
-          String response;
+          String response = input.readLine();
+          clientOutputBox.append(" " + response);
+
           while (input.ready() && (response = input.readLine()) != null) {
             clientOutputBox.append(" " + response);
             // only add colours to the combo box on GUI, not other text from the server
             // output
-            if (!(response.contains("Board"))) {
-              colourCombo.addItem(response);
-            }
+            colourCombo.addItem(response);
+
           }
           clientOutputBox.append(
               "\n [SERVER]: IMPORTANT: Note colours are case sensitive. You must stay within the bounds of the board.\n");
         } catch (Exception e) {
           displayErrorMsg("500 - Internal Server Error: Server response could not be read.");
           return false;
+        } finally {
+          if (!socket.isConnected()) {
+            socket.close();
+          }
         }
       }
     } catch (NumberFormatException nfe) {
